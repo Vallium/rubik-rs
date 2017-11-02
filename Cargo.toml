@@ -1,0 +1,6 @@
+[package]
+name = "rubik"
+version = "0.1.0"
+authors = ["Vallium <anton.alliot@gmail.com>"]
+
+[dependencies]
