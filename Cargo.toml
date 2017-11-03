@@ -4,3 +4,4 @@ version = "0.1.0"
 authors = ["Vallium <anton.alliot@gmail.com>"]
 
 [dependencies]
+smallvec = "0.5.0"
