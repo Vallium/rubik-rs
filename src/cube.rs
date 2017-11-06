@@ -15,13 +15,26 @@ enum Face {
 impl Face {
     fn color(&self) -> &str {
         match *self {
-            Face::F => "\x1b[7;33m", // Orange
+            Face::F => "\x1b[7;33m", // Yellow
             Face::B => "\x1b[7;31m", // Red
             Face::U => "\x1b[7;37m", // White
             Face::D => "\x1b[7;30m", // Black
             Face::L => "\x1b[7;32m", // Green
             Face::R => "\x1b[7;34m", // Blue
         }
+    }
+}
+
+impl ToString for Face {
+    fn to_string(&self) -> String {
+        match *self {
+            Face::F => "F",
+            Face::B => "B",
+            Face::U => "U",
+            Face::D => "D",
+            Face::L => "L",
+            Face::R => "R",
+        }.to_string()
     }
 }
 
@@ -74,9 +87,26 @@ impl Corner {
     }
 }
 
+impl From<Corner> for usize {
+    fn from(c: Corner) -> Self {
+        use self::Corner::*;
+
+        match c {
+            UFR => 0,
+            UFL => 1,
+            UBL => 2,
+            UBR => 3,
+            DFR => 4,
+            DFL => 5,
+            DBL => 6,
+            DBR => 7,
+        }
+    }
+}
+
 struct Corners {
     map: HashMap<Corner, Corner>,
-    orientation: [u8; 8],
+    orientations: [u8; 8],
 }
 
 impl Corners {
@@ -101,7 +131,7 @@ impl Default for Corners {
 
         Self {
             map: corners,
-            orientation: [0; 8],
+            orientations: [0; 8],
         }
     }
 }
@@ -161,9 +191,30 @@ impl Edge {
     }
 }
 
+impl From<Edge> for usize {
+    fn from(e: Edge) -> Self {
+        use self::Edge::*;
+
+        match e {
+            UR => 0,
+            UF => 1,
+            UL => 2,
+            UB => 3,
+            DR => 4,
+            DF => 5,
+            DL => 6,
+            DB => 7,
+            FR => 8,
+            FL => 9,
+            BR => 10,
+            BL => 11,
+        }
+    }
+}
+
 struct Edges {
     map: HashMap<Edge, Edge>,
-    orientation: [u8; 12],
+    orientations: [u8; 12],
 }
 
 impl Edges {
@@ -192,7 +243,7 @@ impl Default for Edges {
 
         Self {
             map: edges,
-            orientation: [0; 12],
+            orientations: [0; 12],
         }
     }
 }
@@ -218,5 +269,88 @@ impl Cube {
             corners: Corners::new(),
             edges: Edges::new(),
         }
+    }
+
+    fn get_face(&self, face: Face) -> [Face; 9] {
+        use self::Corner::*;
+        let corners = match face {
+            Face::F => [UFL, UFR, DFR, DFL],
+            Face::B => [UBL, UBR, DBL, DBR],
+            Face::U => [UBL, UBR, UFR, UFL],
+            Face::D => [DFL, DFR, DBR, DBL],
+            Face::L => [UBL, UFL, DFL, DBL],
+            Face::R => [UFR, UBR, DBR, DFR],
+        };
+
+        let mut corner_faces: [self::Face; 4] = [self::Face::F; 4];
+
+        for (i, c) in (&corners).iter().enumerate() {
+            let corner_cubie: Corner = *self.corners.map.get(&c).unwrap();
+            let corner_index: usize = corner_cubie.into();
+
+            corner_faces[i] = corner_cubie.get_face(*c, self.corners.orientations[corner_index], face);
+        }
+
+        use self::Edge::*;
+        let edges = match face {
+            Face::F => [UF, FR, DF, FL],
+            Face::B => [UB, BL, DB, BR],
+            Face::U => [UB, UR, UF, UL],
+            Face::D => [DF, DR, DB, DL],
+            Face::L => [UL, FL, DL, BL],
+            Face::R => [UR, BR, DR, FR],
+        };
+
+        let mut edge_faces: [self::Face; 4] = [self::Face::F; 4];
+
+        for (i, e) in (&edges).iter().enumerate() {
+            let edge_cubie: Edge = *self.edges.map.get(&e).unwrap();
+            let edge_index: usize = edge_cubie.into();
+
+            edge_faces[i] = edge_cubie.get_face(*e, self.edges.orientations[edge_index], face);
+        }
+
+        [corner_faces[0], edge_faces[0], corner_faces[1],
+        edge_faces[3], face, edge_faces[1],
+        corner_faces[3], edge_faces[2], corner_faces[2]]
+    }
+
+    pub fn print(&self) {
+        let faces = [
+            self.get_face(self::Face::U),
+            self.get_face(self::Face::L),
+            self.get_face(self::Face::F),
+            self.get_face(self::Face::R),
+            self.get_face(self::Face::B),
+            self.get_face(self::Face::D),
+        ];
+        print!("\n         ");
+        for i in 0..9 {
+            print!("{} {} \x1b[0m", faces[0][i].color(), faces[0][i].to_string());
+            if i > 0 && (i+1) % 3 == 0 {
+                print!("\n         ");
+            }
+        }
+        print!("\r");
+        for y in 0..3 {
+            for &face in &faces {
+                for x in 0..3 {
+                    if face[x+y*3] != self::Face::U && face[x+y*3] != self::Face::D {
+                        print!("{} {} \x1b[0m", face[x+y*3].color(), face[x+y*3].to_string());
+                    }
+                }
+            }
+            print!("\n");
+        }
+
+        print!("         ");
+        for i in 0..9 {
+            print!("{} {} \x1b[0m", faces[5][i].color(), faces[5][i].to_string());
+
+            if i > 0 && (i+1) % 3 == 0 {
+                print!("\n         ");
+            }
+        }
+        print!("\r");
     }
 }

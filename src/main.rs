@@ -13,7 +13,8 @@ fn main() {
         }
         Some(arg) => {
             if let Ok(shuffle_sequence) = Move::sequence_from_str(&arg) {
-                let mut cube = Cube::from_shuffle_sequence(&shuffle_sequence);
+                let cube = Cube::from_shuffle_sequence(&shuffle_sequence);
+                cube.print();
             }
         }
     }
