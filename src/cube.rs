@@ -2,7 +2,8 @@ use std::collections::HashMap;
 
 use move_::Move;
 
-pub enum Face {
+#[derive(Clone, Copy, Eq, PartialEq)]
+enum Face {
     F, // Front
     B, // Back
     U, // Up
@@ -12,7 +13,7 @@ pub enum Face {
 }
 
 impl Face {
-    pub fn color(&self) -> &str {
+    fn color(&self) -> &str {
         match *self {
             Face::F => "\x1b[7;33m", // Orange
             Face::B => "\x1b[7;31m", // Red
@@ -50,10 +51,32 @@ impl Corner {
             DBR => (Face::D, Face::B, Face::R),
         }
     }
+
+    fn orient(&self, orientation: u8) -> (Face, Face, Face) {
+        let (a, b, c) = (*self).decompose();
+
+        match orientation {
+            0 => (a, b, c),
+            1 => (b, c, a),
+            _ => (c, a, b),
+        }
+    }
+
+    fn get_face(&self, cubicle: Corner, orientation: u8, face: Face) -> Face {
+        let (oriented_a, oriented_b, oriented_c) = (*self).orient(orientation);
+        let (a, b, _c) = cubicle.decompose();
+
+        match face {
+            x if x == a => oriented_a,
+            x if x == b => oriented_b,
+            _ => oriented_c,
+        }
+    }
 }
 
 struct Corners {
-    map: HashMap<Corner, Corner>
+    map: HashMap<Corner, Corner>,
+    orientation: [u8; 8],
 }
 
 impl Corners {
@@ -78,6 +101,7 @@ impl Default for Corners {
 
         Self {
             map: corners,
+            orientation: [0; 8],
         }
     }
 }
@@ -116,10 +140,30 @@ impl Edge {
             BL => (Face::B, Face::L),
         }
     }
+
+    fn orient(&self, orientation: u8) -> (Face, Face) {
+        let (a, b) = (*self).decompose();
+
+        match orientation {
+            0 => (a, b),
+            _ => (b, a),
+        }
+    }
+
+    fn get_face(&self, cubicle: Edge, orientation: u8, face: Face) -> Face {
+        let (oriented_a, oriented_b) = (*self).orient(orientation);
+        let (a, _b) = cubicle.decompose();
+
+        match face {
+            x if x == a => oriented_a,
+            _ => oriented_b,
+        }
+    }
 }
 
 struct Edges {
-    map: HashMap<Edge, Edge>
+    map: HashMap<Edge, Edge>,
+    orientation: [u8; 12],
 }
 
 impl Edges {
@@ -148,6 +192,7 @@ impl Default for Edges {
 
         Self {
             map: edges,
+            orientation: [0; 12],
         }
     }
 }
