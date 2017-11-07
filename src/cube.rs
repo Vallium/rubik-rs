@@ -214,7 +214,7 @@ impl From<Edge> for usize {
 }
 
 struct Edges {
-    map: HashMap<Edge, Edge>,
+    permutations: [Edge; 12],
     orientations: [u8; 12],
 }
 
@@ -226,24 +226,24 @@ impl Edges {
 
 impl Default for Edges {
     fn default() -> Self {
-        let mut edges = HashMap::new();
+        let mut edges: [Edge; 12] = [UR; 12];
         use self::Edge::*;
 
-        edges.insert(UR, UR);
-        edges.insert(UF, UF);
-        edges.insert(UL, UL);
-        edges.insert(UB, UB);
-        edges.insert(DR, DR);
-        edges.insert(DF, DF);
-        edges.insert(DL, DL);
-        edges.insert(DB, DB);
-        edges.insert(FR, FR);
-        edges.insert(FL, FL);
-        edges.insert(BR, BR);
-        edges.insert(BL, BL);
+        edges[usize::from(UR)] = UR;
+        edges[usize::from(UF)] = UF;
+        edges[usize::from(UL)] = UL;
+        edges[usize::from(UB)] = UB;
+        edges[usize::from(DR)] = DR;
+        edges[usize::from(DF)] = DF;
+        edges[usize::from(DL)] = DL;
+        edges[usize::from(DB)] = DB;
+        edges[usize::from(FR)] = FR;
+        edges[usize::from(FL)] = FL;
+        edges[usize::from(BR)] = BR;
+        edges[usize::from(BL)] = BL;
 
         Self {
-            map: edges,
+            permutations: edges,
             orientations: [0; 12],
         }
     }
@@ -305,7 +305,7 @@ impl Cube {
         let mut edge_faces: [self::Face; 4] = [self::Face::F; 4];
 
         for (i, e) in (&edges).iter().enumerate() {
-            let edge_cubie: Edge = *self.edges.map.get(&e).unwrap();
+            let edge_cubie: Edge = self.edges.permutations[usize::from(*e)];
             let edge_index: usize = edge_cubie.into();
 
             edge_faces[i] = edge_cubie.get_face(*e, self.edges.orientations[edge_index], face);
