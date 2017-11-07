@@ -18,10 +18,11 @@ impl Face {
             Face::F => "\x1b[7;33m", // Yellow
             Face::B => "\x1b[7;31m", // Red
             Face::U => "\x1b[7;37m", // White
-            Face::D => "\x1b[7;30m", // Black
+            Face::D => "\x1b[7;47;30m", // Black
             Face::L => "\x1b[7;32m", // Green
             Face::R => "\x1b[7;34m", // Blue
         }
+
     }
 }
 
@@ -105,7 +106,7 @@ impl From<Corner> for usize {
 }
 
 struct Corners {
-    map: HashMap<Corner, Corner>,
+    permutations: [Corner; 8],
     orientations: [u8; 8],
 }
 
@@ -117,20 +118,20 @@ impl Corners {
 
 impl Default for Corners {
     fn default() -> Self {
-        let mut corners = HashMap::new();
+        let mut corners: [Corner; 8] = [UFR; 8];
         use self::Corner::*;
 
-        corners.insert(UFR, UFR);
-        corners.insert(UFL, UFL);
-        corners.insert(UBL, UBL);
-        corners.insert(UBR, UBR);
-        corners.insert(DFR, DFR);
-        corners.insert(DFL, DFL);
-        corners.insert(DBL, DBL);
-        corners.insert(DBR, DBR);
+        corners[usize::from(UFR)] = UFR;
+        corners[usize::from(UFL)] = UFL;
+        corners[usize::from(UBL)] = UBL;
+        corners[usize::from(UBR)] = UBR;
+        corners[usize::from(DFR)] = DFR;
+        corners[usize::from(DFL)] = DFL;
+        corners[usize::from(DBL)] = DBL;
+        corners[usize::from(DBR)] = DBR;
 
         Self {
-            map: corners,
+            permutations: corners,
             orientations: [0; 8],
         }
     }
@@ -285,7 +286,7 @@ impl Cube {
         let mut corner_faces: [self::Face; 4] = [self::Face::F; 4];
 
         for (i, c) in (&corners).iter().enumerate() {
-            let corner_cubie: Corner = *self.corners.map.get(&c).unwrap();
+            let corner_cubie: Corner = self.corners.permutations[usize::from(*c)];
             let corner_index: usize = corner_cubie.into();
 
             corner_faces[i] = corner_cubie.get_face(*c, self.corners.orientations[corner_index], face);
