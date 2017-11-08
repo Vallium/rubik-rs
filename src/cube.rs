@@ -287,9 +287,8 @@ impl Cube {
 
         for (i, c) in (&corners).iter().enumerate() {
             let corner_cubie: Corner = self.corners.permutations[usize::from(*c)];
-            let corner_index: usize = corner_cubie.into();
 
-            corner_faces[i] = corner_cubie.get_face(*c, self.corners.orientations[corner_index], face);
+            corner_faces[i] = corner_cubie.get_face(*c, self.corners.orientations[usize::from(*c)], face);
         }
 
         use self::Edge::*;
@@ -306,9 +305,8 @@ impl Cube {
 
         for (i, e) in (&edges).iter().enumerate() {
             let edge_cubie: Edge = self.edges.permutations[usize::from(*e)];
-            let edge_index: usize = edge_cubie.into();
 
-            edge_faces[i] = edge_cubie.get_face(*e, self.edges.orientations[edge_index], face);
+            edge_faces[i] = edge_cubie.get_face(*e, self.edges.orientations[usize::from(*e)], face);
         }
 
         [corner_faces[0], edge_faces[0], corner_faces[1],
@@ -325,6 +323,7 @@ impl Cube {
             self.get_face(self::Face::B),
             self.get_face(self::Face::D),
         ];
+
         print!("\n         ");
         for i in 0..9 {
             print!("{} {} \x1b[0m", faces[0][i].color(), faces[0][i].to_string());
@@ -335,15 +334,14 @@ impl Cube {
         print!("\r");
         for y in 0..3 {
             for &face in &faces {
-                for x in 0..3 {
-                    if face[x+y*3] != self::Face::U && face[x+y*3] != self::Face::D {
+                if face[4] != self::Face::U && face[4] != self::Face::D {
+                    for x in 0..3 {
                         print!("{} {} \x1b[0m", face[x+y*3].color(), face[x+y*3].to_string());
                     }
                 }
             }
             print!("\n");
         }
-
         print!("         ");
         for i in 0..9 {
             print!("{} {} \x1b[0m", faces[5][i].color(), faces[5][i].to_string());
