@@ -41,28 +41,28 @@ impl ToString for Face {
 
 #[derive(Clone, Copy, Hash, Eq, PartialEq)]
 enum Corner {
-    UFR,
+    URF,
     UFL,
-    UBL,
+    ULB,
     UBR,
     DFR,
-    DFL,
+    DLF,
     DBL,
-    DBR,
+    DRB,
 }
 
 impl Corner {
     fn decompose(&self) -> (Face, Face, Face) {
         use self::Corner::*;
         match *self {
-            UFR => (Face::U, Face::F, Face::R),
+            URF => (Face::U, Face::R, Face::F),
             UFL => (Face::U, Face::F, Face::L),
-            UBL => (Face::U, Face::B, Face::L),
+            ULB => (Face::U, Face::L, Face::B),
             UBR => (Face::U, Face::B, Face::R),
             DFR => (Face::D, Face::F, Face::R),
-            DFL => (Face::D, Face::F, Face::L),
+            DLF => (Face::D, Face::L, Face::F),
             DBL => (Face::D, Face::B, Face::L),
-            DBR => (Face::D, Face::B, Face::R),
+            DRB => (Face::D, Face::R, Face::B),
         }
     }
 
@@ -93,14 +93,14 @@ impl From<Corner> for usize {
         use self::Corner::*;
 
         match c {
-            UFR => 0,
+            URF => 0,
             UFL => 1,
-            UBL => 2,
+            ULB => 2,
             UBR => 3,
             DFR => 4,
-            DFL => 5,
+            DLF => 5,
             DBL => 6,
-            DBR => 7,
+            DRB => 7,
         }
     }
 }
@@ -114,21 +114,59 @@ impl Corners {
     fn new() -> Self {
         Corners::default()
     }
+
+    fn apply_move(&mut self, m: Move) {
+        use self::Corner::*;
+        let corners = match m {
+            Move::Front => (URF, DFR, DLF, UFL),
+            Move::FrontPrime => (URF, UFL, DLF, DFR),
+            Move::Right => (UBR, DRB, DFR, URF),
+            Move::RightPrime => (UBR, URF, DFR, DRB),
+            Move::Up => (URF, UFL, ULB, UBR),
+            Move::UpPrime => (URF, UBR, ULB, UFL),
+            Move::Back => (ULB, DBL, DRB, UBR),
+            Move::BackPrime => (ULB, UBR, DRB, DBL),
+            Move::Left => (UFL, DLF, DBL, ULB),
+            Move::LeftPrime => (UFL, ULB, DBL, DLF),
+            Move::Down => (DRB, DBL, DLF, DFR),
+            Move::DownPrime => (DRB, DFR, DLF, DBL),
+            _ => unimplemented!(),
+        };
+
+        let tmp = self.permutations[usize::from(corners.3)];
+
+        self.permutations[usize::from(corners.3)] = self.permutations[usize::from(corners.2)];
+        self.permutations[usize::from(corners.2)] = self.permutations[usize::from(corners.1)];
+        self.permutations[usize::from(corners.1)] = self.permutations[usize::from(corners.0)];
+        self.permutations[usize::from(corners.0)] = tmp;
+
+        // let tmp2 = self.orientations[usize::from(corners.3)];
+
+        // self.orientations[usize::from(corners.3)] = self.orientations[usize::from(corners.2)];
+        // self.orientations[usize::from(corners.2)] = self.orientations[usize::from(corners.1)];
+        // self.orientations[usize::from(corners.1)] = self.orientations[usize::from(corners.0)];
+        // self.orientations[usize::from(corners.0)] = tmp2;
+
+        // self.orientations[usize::from(corners.3)] = (self.orientations[usize::from(corners.3)] + 1) % 2;
+        // self.orientations[usize::from(corners.2)] = (self.orientations[usize::from(corners.2)] + 1) % 2;
+        // self.orientations[usize::from(corners.1)] = 1;//(self.orientations[usize::from(corners.1)] + 1) % 2;
+        // self.orientations[usize::from(corners.0)] = (self.orientations[usize::from(corners.0)] + 1) % 2;
+    }
 }
 
 impl Default for Corners {
     fn default() -> Self {
-        let mut corners: [Corner; 8] = [UFR; 8];
+        let mut corners: [Corner; 8] = [URF; 8];
         use self::Corner::*;
 
-        corners[usize::from(UFR)] = UFR;
+        corners[usize::from(URF)] = URF;
         corners[usize::from(UFL)] = UFL;
-        corners[usize::from(UBL)] = UBL;
+        corners[usize::from(ULB)] = ULB;
         corners[usize::from(UBR)] = UBR;
         corners[usize::from(DFR)] = DFR;
-        corners[usize::from(DFL)] = DFL;
+        corners[usize::from(DLF)] = DLF;
         corners[usize::from(DBL)] = DBL;
-        corners[usize::from(DBR)] = DBR;
+        corners[usize::from(DRB)] = DRB;
 
         Self {
             permutations: corners,
@@ -275,12 +313,12 @@ impl Cube {
     fn get_face(&self, face: Face) -> [Face; 9] {
         use self::Corner::*;
         let corners = match face {
-            Face::F => [UFL, UFR, DFR, DFL],
-            Face::B => [UBL, UBR, DBL, DBR],
-            Face::U => [UBL, UBR, UFR, UFL],
-            Face::D => [DFL, DFR, DBR, DBL],
-            Face::L => [UBL, UFL, DFL, DBL],
-            Face::R => [UFR, UBR, DBR, DFR],
+            Face::F => [UFL, URF, DFR, DLF],
+            Face::B => [ULB, UBR, DBL, DRB],
+            Face::U => [ULB, UBR, URF, UFL],
+            Face::D => [DLF, DFR, DRB, DBL],
+            Face::L => [ULB, UFL, DLF, DBL],
+            Face::R => [URF, UBR, DRB, DFR],
         };
 
         let mut corner_faces: [self::Face; 4] = [self::Face::F; 4];
