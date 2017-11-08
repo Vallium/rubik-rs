@@ -140,17 +140,17 @@ impl Corners {
         self.permutations[usize::from(corners.1)] = self.permutations[usize::from(corners.0)];
         self.permutations[usize::from(corners.0)] = tmp;
 
-        // let tmp2 = self.orientations[usize::from(corners.3)];
+        let tmp2 = self.orientations[usize::from(corners.3)];
 
-        // self.orientations[usize::from(corners.3)] = self.orientations[usize::from(corners.2)];
-        // self.orientations[usize::from(corners.2)] = self.orientations[usize::from(corners.1)];
-        // self.orientations[usize::from(corners.1)] = self.orientations[usize::from(corners.0)];
-        // self.orientations[usize::from(corners.0)] = tmp2;
+        self.orientations[usize::from(corners.3)] = self.orientations[usize::from(corners.2)];
+        self.orientations[usize::from(corners.2)] = self.orientations[usize::from(corners.1)];
+        self.orientations[usize::from(corners.1)] = self.orientations[usize::from(corners.0)];
+        self.orientations[usize::from(corners.0)] = tmp2;
 
-        // self.orientations[usize::from(corners.3)] = (self.orientations[usize::from(corners.3)] + 1) % 2;
-        // self.orientations[usize::from(corners.2)] = (self.orientations[usize::from(corners.2)] + 1) % 2;
-        // self.orientations[usize::from(corners.1)] = 1;//(self.orientations[usize::from(corners.1)] + 1) % 2;
-        // self.orientations[usize::from(corners.0)] = (self.orientations[usize::from(corners.0)] + 1) % 2;
+        self.orientations[usize::from(corners.3)] = (self.orientations[usize::from(corners.3)] + 1) % 3;
+        self.orientations[usize::from(corners.2)] = (self.orientations[usize::from(corners.2)] + 2) % 3;
+        self.orientations[usize::from(corners.1)] = (self.orientations[usize::from(corners.1)] + 1) % 3;
+        self.orientations[usize::from(corners.0)] = (self.orientations[usize::from(corners.0)] + 2) % 3;
     }
 }
 
