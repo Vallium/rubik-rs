@@ -327,6 +327,44 @@ impl Edges {
     fn new() -> Self {
         Edges::default()
     }
+
+    fn apply_move(&mut self, m: Move) {
+        use self::Edge::*;
+        let edges = match m {
+            Move::Front => (UF, FR, DF, FL),
+            Move::FrontPrime => (UF, FL, DF, FR),
+            Move::Right => (UR, BR, DR, FR),
+            Move::RightPrime => (UR, FR, DR, BR),
+            Move::Up => (UB, UR, UF, UL),
+            Move::UpPrime => (UB, UL, UF, UR),
+            Move::Back => (UB, BL, DB, BR),
+            Move::BackPrime => (UB, BR, DB, BL),
+            Move::Left => (UL, FL, DL, BL),
+            Move::LeftPrime => (UL, BL, DL, FL),
+            Move::Down => (DF, DR, DB, DL),
+            Move::DownPrime => (DF, DL, DB, DR),
+            _ => unimplemented!(),
+        };
+
+        let tmp = self.permutations[usize::from(edges.3)];
+
+        self.permutations[usize::from(edges.3)] = self.permutations[usize::from(edges.2)];
+        self.permutations[usize::from(edges.2)] = self.permutations[usize::from(edges.1)];
+        self.permutations[usize::from(edges.1)] = self.permutations[usize::from(edges.0)];
+        self.permutations[usize::from(edges.0)] = tmp;
+
+        let tmp2 = self.orientations[usize::from(edges.3)];
+
+        self.orientations[usize::from(edges.3)] = self.orientations[usize::from(edges.2)];
+        self.orientations[usize::from(edges.2)] = self.orientations[usize::from(edges.1)];
+        self.orientations[usize::from(edges.1)] = self.orientations[usize::from(edges.0)];
+        self.orientations[usize::from(edges.0)] = tmp2;
+
+        self.orientations[usize::from(edges.3)] = (self.orientations[usize::from(edges.3)] + 1) % 2;
+        self.orientations[usize::from(edges.2)] = (self.orientations[usize::from(edges.2)] + 1) % 2;
+        self.orientations[usize::from(edges.1)] = (self.orientations[usize::from(edges.1)] + 1) % 2;
+        self.orientations[usize::from(edges.0)] = (self.orientations[usize::from(edges.0)] + 1) % 2;
+    }
 }
 
 impl Default for Edges {
