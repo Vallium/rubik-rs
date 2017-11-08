@@ -88,6 +88,23 @@ impl Corner {
     }
 }
 
+impl ToString for Corner {
+    fn to_string(&self) -> String {
+        use self::Corner::*;
+
+        match *self {
+            URF => "URF",
+            UFL => "UFL",
+            ULB => "ULB",
+            UBR => "UBR",
+            DFR => "DFR",
+            DLF => "DLF",
+            DBL => "DBL",
+            DRB => "DRB",
+        }.to_string()
+    }
+}
+
 impl From<Corner> for usize {
     fn from(c: Corner) -> Self {
         use self::Corner::*;
@@ -115,42 +132,85 @@ impl Corners {
         Corners::default()
     }
 
-    fn apply_move(&mut self, m: Move) {
-        use self::Corner::*;
-        let corners = match m {
-            Move::Front => (URF, DFR, DLF, UFL),
-            Move::FrontPrime => (URF, UFL, DLF, DFR),
-            Move::Right => (UBR, DRB, DFR, URF),
-            Move::RightPrime => (UBR, URF, DFR, DRB),
-            Move::Up => (URF, UFL, ULB, UBR),
-            Move::UpPrime => (URF, UBR, ULB, UFL),
-            Move::Back => (ULB, DBL, DRB, UBR),
-            Move::BackPrime => (ULB, UBR, DRB, DBL),
-            Move::Left => (UFL, DLF, DBL, ULB),
-            Move::LeftPrime => (UFL, ULB, DBL, DLF),
-            Move::Down => (DRB, DBL, DLF, DFR),
-            Move::DownPrime => (DRB, DFR, DLF, DBL),
-            _ => unimplemented!(),
-        };
-
+    fn permute(&mut self, corners: (self::Corner, self::Corner, self::Corner, self::Corner)) {
         let tmp = self.permutations[usize::from(corners.3)];
 
         self.permutations[usize::from(corners.3)] = self.permutations[usize::from(corners.2)];
         self.permutations[usize::from(corners.2)] = self.permutations[usize::from(corners.1)];
         self.permutations[usize::from(corners.1)] = self.permutations[usize::from(corners.0)];
         self.permutations[usize::from(corners.0)] = tmp;
+    }
 
-        let tmp2 = self.orientations[usize::from(corners.3)];
+    fn orient(&mut self, corners: (self::Corner, self::Corner, self::Corner, self::Corner), orients: (u8, u8, u8, u8)) {
+        self.orientations[usize::from(corners.3)] = (self.orientations[usize::from(corners.3)] + orients.3) % 3;
+        self.orientations[usize::from(corners.2)] = (self.orientations[usize::from(corners.2)] + orients.2) % 3;
+        self.orientations[usize::from(corners.1)] = (self.orientations[usize::from(corners.1)] + orients.1) % 3;
+        self.orientations[usize::from(corners.0)] = (self.orientations[usize::from(corners.0)] + orients.0) % 3;
+    }
 
-        self.orientations[usize::from(corners.3)] = self.orientations[usize::from(corners.2)];
-        self.orientations[usize::from(corners.2)] = self.orientations[usize::from(corners.1)];
-        self.orientations[usize::from(corners.1)] = self.orientations[usize::from(corners.0)];
-        self.orientations[usize::from(corners.0)] = tmp2;
+    pub fn apply_move(&mut self, m: Move) {
+        use self::Corner::*;
+        let mut corners: (self::Corner, self::Corner, self::Corner, self::Corner);
 
-        self.orientations[usize::from(corners.3)] = (self.orientations[usize::from(corners.3)] + 1) % 3;
-        self.orientations[usize::from(corners.2)] = (self.orientations[usize::from(corners.2)] + 2) % 3;
-        self.orientations[usize::from(corners.1)] = (self.orientations[usize::from(corners.1)] + 1) % 3;
-        self.orientations[usize::from(corners.0)] = (self.orientations[usize::from(corners.0)] + 2) % 3;
+        match m {
+            Move::Front => {
+                corners = (URF, DFR, DLF, UFL);
+                self.permute(corners);
+                self.orient(corners, (2, 1, 2, 1));
+            },
+            Move::FrontPrime => {
+                corners = (URF, UFL, DLF, DFR);
+                self.permute(corners);
+                self.orient(corners, (2, 1, 2, 1));
+            },
+            Move::Right => {
+                corners = (UBR, DRB, DFR, URF);
+                self.permute(corners);
+                self.orient(corners, (2, 1, 2, 1));
+            },
+            Move::RightPrime => {
+                corners = (UBR, URF, DFR, DRB);
+                self.permute(corners);
+                self.orient(corners, (1, 2, 1, 2));
+            },
+            Move::Up => {
+                corners = (URF, UFL, ULB, UBR);
+                self.permute(corners);
+            },
+            Move::UpPrime => {
+                corners = (URF, UBR, ULB, UFL);
+                self.permute(corners);
+            },
+            Move::Back => {
+                corners = (ULB, DBL, DRB, UBR);
+                self.permute(corners);
+                self.orient(corners, (2, 1, 2, 1));
+            },
+            Move::BackPrime => {
+                corners = (ULB, UBR, DRB, DBL);
+                self.permute(corners);
+                self.orient(corners, (2, 1, 2, 1));
+            },
+            Move::Left => {
+                corners = (UFL, DLF, DBL, ULB);
+                self.permute(corners);
+                self.orient(corners, (2, 1, 2, 1));
+            },
+            Move::LeftPrime => {
+                corners = (UFL, ULB, DBL, DLF);
+                self.permute(corners);
+                self.orient(corners, (1, 2, 1, 2));
+            },
+            Move::Down => {
+                corners = (DRB, DBL, DLF, DFR);
+                self.permute(corners);
+            },
+            Move::DownPrime => {
+                corners = (DRB, DFR, DLF, DBL);
+                self.permute(corners);
+            },
+            _ => unimplemented!(),
+        }
     }
 }
 
@@ -310,6 +370,11 @@ impl Cube {
         }
     }
 
+    pub fn apply_move(&mut self, m: Move) {
+        self.corners.apply_move(m);
+                // cube.edges.apply_move(self::Move::Right);
+    }
+
     fn get_face(&self, face: Face) -> [Face; 9] {
         use self::Corner::*;
         let corners = match face {
@@ -347,6 +412,12 @@ impl Cube {
             edge_faces[i] = edge_cubie.get_face(*e, self.edges.orientations[usize::from(*e)], face);
         }
 
+        if face == Face::B {
+            println!("{}", face.to_string());
+            println!("{} {} {} {} {} {} \x1b[0m", corner_faces[0].color(), corner_faces[0].to_string(), edge_faces[0].color(), edge_faces[0].to_string(), corner_faces[1].color(), corner_faces[1].to_string());
+            println!("{} {} {} {} {} {} \x1b[0m", edge_faces[3].color(), edge_faces[3].to_string(), face.color(), face.to_string(), edge_faces[1].color(), edge_faces[1].to_string());
+            println!("{} {} {} {} {} {} \x1b[0m", corner_faces[3].color(), corner_faces[3].to_string(), edge_faces[2].color(), edge_faces[2].to_string(), corner_faces[2].color(), corner_faces[2].to_string());
+        }
         [corner_faces[0], edge_faces[0], corner_faces[1],
         edge_faces[3], face, edge_faces[1],
         corner_faces[3], edge_faces[2], corner_faces[2]]
