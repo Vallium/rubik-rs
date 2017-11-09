@@ -252,10 +252,10 @@ enum Edge {
     DF,
     DL,
     DB,
-    FR,
-    FL,
-    BR,
-    BL,
+    RF,
+    LF,
+    RB,
+    LB,
 }
 
 impl Edge {
@@ -270,10 +270,10 @@ impl Edge {
             DF => (Face::D, Face::F),
             DL => (Face::D, Face::L),
             DB => (Face::D, Face::B),
-            FR => (Face::F, Face::R),
-            FL => (Face::F, Face::L),
-            BR => (Face::B, Face::R),
-            BL => (Face::B, Face::L),
+            RF => (Face::R, Face::F),
+            LF => (Face::L, Face::F),
+            RB => (Face::R, Face::B),
+            LB => (Face::L, Face::B),
         }
     }
 
@@ -310,10 +310,10 @@ impl From<Edge> for usize {
             DF => 5,
             DL => 6,
             DB => 7,
-            FR => 8,
-            FL => 9,
-            BR => 10,
-            BL => 11,
+            RF => 8,
+            LF => 9,
+            RB => 10,
+            LB => 11,
         }
     }
 }
@@ -328,31 +328,16 @@ impl Edges {
         Edges::default()
     }
 
-    fn apply_move(&mut self, m: Move) {
-        use self::Edge::*;
-        let edges = match m {
-            Move::Front => (UF, FR, DF, FL),
-            Move::FrontPrime => (UF, FL, DF, FR),
-            Move::Right => (UR, BR, DR, FR),
-            Move::RightPrime => (UR, FR, DR, BR),
-            Move::Up => (UB, UR, UF, UL),
-            Move::UpPrime => (UB, UL, UF, UR),
-            Move::Back => (UB, BL, DB, BR),
-            Move::BackPrime => (UB, BR, DB, BL),
-            Move::Left => (UL, FL, DL, BL),
-            Move::LeftPrime => (UL, BL, DL, FL),
-            Move::Down => (DF, DR, DB, DL),
-            Move::DownPrime => (DF, DL, DB, DR),
-            _ => unimplemented!(),
-        };
-
+    fn permute(&mut self, edges: (self::Edge, self::Edge, self::Edge, self::Edge)) {
         let tmp = self.permutations[usize::from(edges.3)];
 
         self.permutations[usize::from(edges.3)] = self.permutations[usize::from(edges.2)];
         self.permutations[usize::from(edges.2)] = self.permutations[usize::from(edges.1)];
         self.permutations[usize::from(edges.1)] = self.permutations[usize::from(edges.0)];
         self.permutations[usize::from(edges.0)] = tmp;
+    }
 
+    fn orient(&mut self, edges: (self::Edge, self::Edge, self::Edge, self::Edge), orients: (u8, u8, u8, u8)) {
         let tmp2 = self.orientations[usize::from(edges.3)];
 
         self.orientations[usize::from(edges.3)] = self.orientations[usize::from(edges.2)];
@@ -360,10 +345,79 @@ impl Edges {
         self.orientations[usize::from(edges.1)] = self.orientations[usize::from(edges.0)];
         self.orientations[usize::from(edges.0)] = tmp2;
 
-        self.orientations[usize::from(edges.3)] = (self.orientations[usize::from(edges.3)] + 1) % 2;
-        self.orientations[usize::from(edges.2)] = (self.orientations[usize::from(edges.2)] + 1) % 2;
-        self.orientations[usize::from(edges.1)] = (self.orientations[usize::from(edges.1)] + 1) % 2;
-        self.orientations[usize::from(edges.0)] = (self.orientations[usize::from(edges.0)] + 1) % 2;
+        self.orientations[usize::from(edges.3)] = (self.orientations[usize::from(edges.3)] + orients.3) % 2;
+        self.orientations[usize::from(edges.2)] = (self.orientations[usize::from(edges.2)] + orients.2) % 2;
+        self.orientations[usize::from(edges.1)] = (self.orientations[usize::from(edges.1)] + orients.1) % 2;
+        self.orientations[usize::from(edges.0)] = (self.orientations[usize::from(edges.0)] + orients.0) % 2;
+    }
+
+    fn apply_move(&mut self, m: Move) {
+        use self::Edge::*;
+        let edges: (self::Edge, self::Edge, self::Edge, self::Edge);
+
+        match m {
+            Move::Front => {
+                edges = (UF, RF, DF, LF);
+                self.permute(edges);
+                self.orient(edges, (0, 0, 0, 0));
+            },
+            Move::FrontPrime => {
+                edges = (UF, LF, DF, RF);
+                self.permute(edges);
+                self.orient(edges, (0, 0, 0, 0));
+            },
+            Move::Right => {
+                edges = (UR, RB, DR, RF);
+                self.permute(edges);
+                self.orient(edges, (1, 1, 1, 1));
+            },
+            Move::RightPrime => {
+                edges = (UR, RF, DR, RB);
+                self.permute(edges);
+                self.orient(edges, (1, 1, 1, 1));
+            },
+            Move::Up => {
+                edges = (UB, UR, UF, UL);
+                self.permute(edges);
+                self.orient(edges, (0, 0, 0, 0));
+            },
+            Move::UpPrime => {
+                edges = (UB, UL, UF, UR);
+                self.permute(edges);
+                self.orient(edges, (0, 0, 0, 0));
+            },
+            Move::Back => {
+                edges = (UB, LB, DB, RB);
+                self.permute(edges);
+                self.orient(edges, (0, 0, 0, 0));
+            },
+            Move::BackPrime => {
+                edges = (UB, RB, DB, LB);
+                self.permute(edges);
+                self.orient(edges, (0, 0, 0, 0));
+            },
+            Move::Left => {
+                edges = (UL, LF, DL, LB);
+                self.permute(edges);
+                self.orient(edges, (1, 1, 1, 1));
+            },
+            Move::LeftPrime => {
+                edges = (UL, LB, DL, LF);
+                self.permute(edges);
+                self.orient(edges, (1, 1, 1, 1));
+            },
+            Move::Down => {
+                edges = (DF, DR, DB, DL);
+                self.permute(edges);
+                self.orient(edges, (0, 0, 0, 0));
+            },
+            Move::DownPrime => {
+                edges = (DF, DL, DB, DR);
+                self.permute(edges);
+                self.orient(edges, (0, 0, 0, 0));
+            },
+            _ => unimplemented!(),
+        }
     }
 }
 
@@ -380,10 +434,10 @@ impl Default for Edges {
         edges[usize::from(DF)] = DF;
         edges[usize::from(DL)] = DL;
         edges[usize::from(DB)] = DB;
-        edges[usize::from(FR)] = FR;
-        edges[usize::from(FL)] = FL;
-        edges[usize::from(BR)] = BR;
-        edges[usize::from(BL)] = BL;
+        edges[usize::from(RF)] = RF;
+        edges[usize::from(LF)] = LF;
+        edges[usize::from(RB)] = RB;
+        edges[usize::from(LB)] = LB;
 
         Self {
             permutations: edges,
@@ -417,7 +471,7 @@ impl Cube {
 
     pub fn apply_move(&mut self, m: Move) {
         self.corners.apply_move(m);
-                // cube.edges.apply_move(self::Move::Right);
+        self.edges.apply_move(m);
     }
 
     fn get_face(&self, face: Face) -> [Face; 9] {
@@ -441,12 +495,12 @@ impl Cube {
 
         use self::Edge::*;
         let edges = match face {
-            Face::F => [UF, FR, DF, FL],
-            Face::B => [UB, BL, DB, BR],
+            Face::F => [UF, RF, DF, LF],
+            Face::B => [UB, LB, DB, RB],
             Face::U => [UB, UR, UF, UL],
             Face::D => [DF, DR, DB, DL],
-            Face::L => [UL, FL, DL, BL],
-            Face::R => [UR, BR, DR, FR],
+            Face::L => [UL, LF, DL, LB],
+            Face::R => [UR, RB, DR, RF],
         };
 
         let mut edge_faces: [self::Face; 4] = [self::Face::F; 4];

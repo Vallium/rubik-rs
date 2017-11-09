@@ -14,9 +14,9 @@ fn main() {
         Some(arg) => {
             if let Ok(shuffle_sequence) = Move::sequence_from_str(&arg) {
                 let mut cube = Cube::from_shuffle_sequence(&shuffle_sequence);
-                cube.apply_move(Move::Right);
+                cube.apply_move(Move::Front);
                 cube.print();
-                cube.apply_move(Move::RightPrime);
+                cube.apply_move(Move::Right);
                 cube.print();
             }
         }
