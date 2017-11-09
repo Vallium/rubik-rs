@@ -161,7 +161,7 @@ impl Corners {
             Move::FrontPrime => {
                 corners = (URF, UFL, DLF, DFR);
                 self.permute(corners);
-                self.orient(corners, (2, 1, 2, 1));
+                self.orient(corners, (1, 2, 1, 2));
             },
             Move::Right => {
                 corners = (UBR, DRB, DFR, URF);
@@ -189,7 +189,7 @@ impl Corners {
             Move::BackPrime => {
                 corners = (ULB, UBR, DRB, DBL);
                 self.permute(corners);
-                self.orient(corners, (2, 1, 2, 1));
+                self.orient(corners, (1, 2, 1, 2));
             },
             Move::Left => {
                 corners = (UFL, DLF, DBL, ULB);
