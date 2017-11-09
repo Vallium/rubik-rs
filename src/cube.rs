@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use move_::Move;
 
 #[derive(Clone, Copy, Eq, PartialEq)]
@@ -122,6 +120,7 @@ impl From<Corner> for usize {
     }
 }
 
+#[derive(Eq, PartialEq)]
 struct Corners {
     permutations: [Corner; 8],
     orientations: [u8; 8],
@@ -276,6 +275,7 @@ impl From<Edge> for usize {
     }
 }
 
+#[derive(Eq, PartialEq)]
 struct Edges {
     permutations: [Edge; 12],
     orientations: [u8; 12],
@@ -380,6 +380,13 @@ impl Cube {
             corners: Corners::new(),
             edges: Edges::new(),
         }
+    }
+
+    pub fn is_solved(&self) -> bool {
+        if self.corners == Corners::default() && self.edges == Edges::default() {
+            return true
+        }
+        false
     }
 
     pub fn apply_move(&mut self, m: Move) {
