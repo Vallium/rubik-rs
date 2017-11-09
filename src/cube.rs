@@ -142,12 +142,12 @@ impl Corners {
     }
 
     fn orient(&mut self, corners: (self::Corner, self::Corner, self::Corner, self::Corner), orients: (u8, u8, u8, u8)) {
-        let tmp2 = self.orientations[usize::from(corners.3)];
+        let tmp = self.orientations[usize::from(corners.3)];
 
         self.orientations[usize::from(corners.3)] = self.orientations[usize::from(corners.2)];
         self.orientations[usize::from(corners.2)] = self.orientations[usize::from(corners.1)];
         self.orientations[usize::from(corners.1)] = self.orientations[usize::from(corners.0)];
-        self.orientations[usize::from(corners.0)] = tmp2;
+        self.orientations[usize::from(corners.0)] = tmp;
 
         self.orientations[usize::from(corners.3)] = (self.orientations[usize::from(corners.3)] + orients.3) % 3;
         self.orientations[usize::from(corners.2)] = (self.orientations[usize::from(corners.2)] + orients.2) % 3;
@@ -157,67 +157,25 @@ impl Corners {
 
     pub fn apply_move(&mut self, m: Move) {
         use self::Corner::*;
-        let mut corners: (self::Corner, self::Corner, self::Corner, self::Corner);
 
-        match m {
-            Move::Front => {
-                corners = (URF, DFR, DLF, UFL);
-                self.permute(corners);
-                self.orient(corners, (2, 1, 2, 1));
-            },
-            Move::FrontPrime => {
-                corners = (URF, UFL, DLF, DFR);
-                self.permute(corners);
-                self.orient(corners, (2, 1, 2, 1));
-            },
-            Move::Right => {
-                corners = (UBR, DRB, DFR, URF);
-                self.permute(corners);
-                self.orient(corners, (2, 1, 2, 1));
-            },
-            Move::RightPrime => {
-                corners = (UBR, URF, DFR, DRB);
-                self.permute(corners);
-                self.orient(corners, (2, 1, 2, 1));
-            },
-            Move::Up => {
-                corners = (URF, UFL, ULB, UBR);
-                self.permute(corners);
-            },
-            Move::UpPrime => {
-                corners = (URF, UBR, ULB, UFL);
-                self.permute(corners);
-            },
-            Move::Back => {
-                corners = (ULB, DBL, DRB, UBR);
-                self.permute(corners);
-                self.orient(corners, (2, 1, 2, 1));
-            },
-            Move::BackPrime => {
-                corners = (ULB, UBR, DRB, DBL);
-                self.permute(corners);
-                self.orient(corners, (2, 1, 2, 1));
-            },
-            Move::Left => {
-                corners = (UFL, DLF, DBL, ULB);
-                self.permute(corners);
-                self.orient(corners, (2, 1, 2, 1));
-            },
-            Move::LeftPrime => {
-                corners = (UFL, ULB, DBL, DLF);
-                self.permute(corners);
-                self.orient(corners, (2, 1, 2, 1));
-            },
-            Move::Down => {
-                corners = (DRB, DBL, DLF, DFR);
-                self.permute(corners);
-            },
-            Move::DownPrime => {
-                corners = (DRB, DFR, DLF, DBL);
-                self.permute(corners);
-            },
+        let (corners, orientations) = match m {
+            Move::Front => ((URF, DFR, DLF, UFL), (2, 1, 2, 1)),
+            Move::FrontPrime => ((URF, UFL, DLF, DFR), (2, 1, 2, 1)),
+            Move::Right => ((UBR, DRB, DFR, URF), (2, 1, 2, 1)),
+            Move::RightPrime => ((UBR, URF, DFR, DRB), (2, 1, 2, 1)),
+            Move::Up => ((URF, UFL, ULB, UBR), (0, 0, 0, 0)),
+            Move::UpPrime => ((URF, UBR, ULB, UFL), (0, 0, 0, 0)),
+            Move::Back => ((ULB, DBL, DRB, UBR), (2, 1, 2, 1)),
+            Move::BackPrime => ((ULB, UBR, DRB, DBL), (2, 1, 2, 1)),
+            Move::Left => ((UFL, DLF, DBL, ULB), (2, 1, 2, 1)),
+            Move::LeftPrime => ((UFL, ULB, DBL, DLF), (2, 1, 2, 1)),
+            Move::Down => ((DRB, DBL, DLF, DFR), (0, 0, 0, 0)),
+            Move::DownPrime => ((DRB, DFR, DLF, DBL), (0, 0, 0, 0)),
             _ => unimplemented!(),
-        }
+        };
+
+        self.permute(corners);
+        self.orient(corners, orientations);
     }
 }
 
@@ -338,12 +296,12 @@ impl Edges {
     }
 
     fn orient(&mut self, edges: (self::Edge, self::Edge, self::Edge, self::Edge), orients: (u8, u8, u8, u8)) {
-        let tmp2 = self.orientations[usize::from(edges.3)];
+        let tmp = self.orientations[usize::from(edges.3)];
 
         self.orientations[usize::from(edges.3)] = self.orientations[usize::from(edges.2)];
         self.orientations[usize::from(edges.2)] = self.orientations[usize::from(edges.1)];
         self.orientations[usize::from(edges.1)] = self.orientations[usize::from(edges.0)];
-        self.orientations[usize::from(edges.0)] = tmp2;
+        self.orientations[usize::from(edges.0)] = tmp;
 
         self.orientations[usize::from(edges.3)] = (self.orientations[usize::from(edges.3)] + orients.3) % 2;
         self.orientations[usize::from(edges.2)] = (self.orientations[usize::from(edges.2)] + orients.2) % 2;
@@ -355,69 +313,24 @@ impl Edges {
         use self::Edge::*;
         let edges: (self::Edge, self::Edge, self::Edge, self::Edge);
 
-        match m {
-            Move::Front => {
-                edges = (UF, RF, DF, LF);
-                self.permute(edges);
-                self.orient(edges, (0, 0, 0, 0));
-            },
-            Move::FrontPrime => {
-                edges = (UF, LF, DF, RF);
-                self.permute(edges);
-                self.orient(edges, (0, 0, 0, 0));
-            },
-            Move::Right => {
-                edges = (UR, RB, DR, RF);
-                self.permute(edges);
-                self.orient(edges, (1, 1, 1, 1));
-            },
-            Move::RightPrime => {
-                edges = (UR, RF, DR, RB);
-                self.permute(edges);
-                self.orient(edges, (1, 1, 1, 1));
-            },
-            Move::Up => {
-                edges = (UB, UR, UF, UL);
-                self.permute(edges);
-                self.orient(edges, (0, 0, 0, 0));
-            },
-            Move::UpPrime => {
-                edges = (UB, UL, UF, UR);
-                self.permute(edges);
-                self.orient(edges, (0, 0, 0, 0));
-            },
-            Move::Back => {
-                edges = (UB, LB, DB, RB);
-                self.permute(edges);
-                self.orient(edges, (0, 0, 0, 0));
-            },
-            Move::BackPrime => {
-                edges = (UB, RB, DB, LB);
-                self.permute(edges);
-                self.orient(edges, (0, 0, 0, 0));
-            },
-            Move::Left => {
-                edges = (UL, LF, DL, LB);
-                self.permute(edges);
-                self.orient(edges, (1, 1, 1, 1));
-            },
-            Move::LeftPrime => {
-                edges = (UL, LB, DL, LF);
-                self.permute(edges);
-                self.orient(edges, (1, 1, 1, 1));
-            },
-            Move::Down => {
-                edges = (DF, DR, DB, DL);
-                self.permute(edges);
-                self.orient(edges, (0, 0, 0, 0));
-            },
-            Move::DownPrime => {
-                edges = (DF, DL, DB, DR);
-                self.permute(edges);
-                self.orient(edges, (0, 0, 0, 0));
-            },
+        let (edges, orientations) = match m {
+            Move::Front => ((UF, RF, DF, LF), (0, 0, 0, 0)),
+            Move::FrontPrime => ((UF, LF, DF, RF), (0, 0, 0, 0)),
+            Move::Right => ((UR, RB, DR, RF), (1, 1, 1, 1)),
+            Move::RightPrime => ((UR, RF, DR, RB), (1, 1, 1, 1)),
+            Move::Up => ((UB, UR, UF, UL), (0, 0, 0, 0)),
+            Move::UpPrime => ((UB, UL, UF, UR), (0, 0, 0, 0)),
+            Move::Back => ((UB, LB, DB, RB), (0, 0, 0, 0)),
+            Move::BackPrime => ((UB, RB, DB, LB), (0, 0, 0, 0)),
+            Move::Left => ((UL, LF, DL, LB), (1, 1, 1, 1)),
+            Move::LeftPrime => ((UL, LB, DL, LF), (1, 1, 1, 1)),
+            Move::Down => ((DF, DR, DB, DL), (0, 0, 0, 0)),
+            Move::DownPrime => ((DF, DL, DB, DR), (0, 0, 0, 0)),
             _ => unimplemented!(),
-        }
+        };
+
+        self.permute(edges);
+        self.orient(edges, orientations);
     }
 }
 
