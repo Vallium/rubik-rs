@@ -379,7 +379,7 @@ impl Cube {
         use self::Corner::*;
         let corners = match face {
             Face::F => [UFL, URF, DFR, DLF],
-            Face::B => [ULB, UBR, DBL, DRB],
+            Face::B => [UBR, ULB, DBL, DRB],
             Face::U => [ULB, UBR, URF, UFL],
             Face::D => [DLF, DFR, DRB, DBL],
             Face::L => [ULB, UFL, DLF, DBL],
@@ -412,12 +412,6 @@ impl Cube {
             edge_faces[i] = edge_cubie.get_face(*e, self.edges.orientations[usize::from(*e)], face);
         }
 
-        if face == Face::B {
-            println!("{}", face.to_string());
-            println!("{} {} {} {} {} {} \x1b[0m", corner_faces[0].color(), corner_faces[0].to_string(), edge_faces[0].color(), edge_faces[0].to_string(), corner_faces[1].color(), corner_faces[1].to_string());
-            println!("{} {} {} {} {} {} \x1b[0m", edge_faces[3].color(), edge_faces[3].to_string(), face.color(), face.to_string(), edge_faces[1].color(), edge_faces[1].to_string());
-            println!("{} {} {} {} {} {} \x1b[0m", corner_faces[3].color(), corner_faces[3].to_string(), edge_faces[2].color(), edge_faces[2].to_string(), corner_faces[2].color(), corner_faces[2].to_string());
-        }
         [corner_faces[0], edge_faces[0], corner_faces[1],
         edge_faces[3], face, edge_faces[1],
         corner_faces[3], edge_faces[2], corner_faces[2]]
