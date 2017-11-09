@@ -142,6 +142,13 @@ impl Corners {
     }
 
     fn orient(&mut self, corners: (self::Corner, self::Corner, self::Corner, self::Corner), orients: (u8, u8, u8, u8)) {
+        let tmp2 = self.orientations[usize::from(corners.3)];
+
+        self.orientations[usize::from(corners.3)] = self.orientations[usize::from(corners.2)];
+        self.orientations[usize::from(corners.2)] = self.orientations[usize::from(corners.1)];
+        self.orientations[usize::from(corners.1)] = self.orientations[usize::from(corners.0)];
+        self.orientations[usize::from(corners.0)] = tmp2;
+
         self.orientations[usize::from(corners.3)] = (self.orientations[usize::from(corners.3)] + orients.3) % 3;
         self.orientations[usize::from(corners.2)] = (self.orientations[usize::from(corners.2)] + orients.2) % 3;
         self.orientations[usize::from(corners.1)] = (self.orientations[usize::from(corners.1)] + orients.1) % 3;
@@ -161,7 +168,7 @@ impl Corners {
             Move::FrontPrime => {
                 corners = (URF, UFL, DLF, DFR);
                 self.permute(corners);
-                self.orient(corners, (1, 2, 1, 2));
+                self.orient(corners, (2, 1, 2, 1));
             },
             Move::Right => {
                 corners = (UBR, DRB, DFR, URF);
@@ -171,7 +178,7 @@ impl Corners {
             Move::RightPrime => {
                 corners = (UBR, URF, DFR, DRB);
                 self.permute(corners);
-                self.orient(corners, (1, 2, 1, 2));
+                self.orient(corners, (2, 1, 2, 1));
             },
             Move::Up => {
                 corners = (URF, UFL, ULB, UBR);
@@ -189,7 +196,7 @@ impl Corners {
             Move::BackPrime => {
                 corners = (ULB, UBR, DRB, DBL);
                 self.permute(corners);
-                self.orient(corners, (1, 2, 1, 2));
+                self.orient(corners, (2, 1, 2, 1));
             },
             Move::Left => {
                 corners = (UFL, DLF, DBL, ULB);
@@ -199,7 +206,7 @@ impl Corners {
             Move::LeftPrime => {
                 corners = (UFL, ULB, DBL, DLF);
                 self.permute(corners);
-                self.orient(corners, (1, 2, 1, 2));
+                self.orient(corners, (2, 1, 2, 1));
             },
             Move::Down => {
                 corners = (DRB, DBL, DLF, DFR);
