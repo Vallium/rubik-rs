@@ -1,9 +1,11 @@
 mod face;
+mod cube_move;
 mod corners;
 mod edges;
 
 use move_::Move;
 use cube::face::Face;
+use cube::cube_move::CubeMove;
 use cube::corners::Corners;
 use cube::edges::Edges;
 
@@ -38,6 +40,47 @@ impl Cube {
     }
 
     pub fn apply_move(&mut self, m: Move) {
+        match m {
+            Move::Front => self.apply_cube_move(CubeMove::Front),
+            Move::FrontPrime => self.apply_cube_move(CubeMove::FrontPrime),
+            Move::Front2 => {
+                self.apply_cube_move(CubeMove::Front);
+                self.apply_cube_move(CubeMove::Front);
+            },
+            Move::Right => self.apply_cube_move(CubeMove::Right),
+            Move::RightPrime => self.apply_cube_move(CubeMove::RightPrime),
+            Move::Right2 => {
+                self.apply_cube_move(CubeMove::Right);
+                self.apply_cube_move(CubeMove::Right);
+            },
+            Move::Up => self.apply_cube_move(CubeMove::Up),
+            Move::UpPrime => self.apply_cube_move(CubeMove::UpPrime),
+            Move::Up2 => {
+                self.apply_cube_move(CubeMove::Up);
+                self.apply_cube_move(CubeMove::Up);
+            },
+            Move::Back => self.apply_cube_move(CubeMove::Back),
+            Move::BackPrime => self.apply_cube_move(CubeMove::BackPrime),
+            Move::Back2 => {
+                self.apply_cube_move(CubeMove::Back);
+                self.apply_cube_move(CubeMove::Back);
+            },
+            Move::Left => self.apply_cube_move(CubeMove::Left),
+            Move::LeftPrime => self.apply_cube_move(CubeMove::LeftPrime),
+            Move::Left2 => {
+                self.apply_cube_move(CubeMove::Left);
+                self.apply_cube_move(CubeMove::Left);
+            },
+            Move::Down => self.apply_cube_move(CubeMove::Down),
+            Move::DownPrime => self.apply_cube_move(CubeMove::DownPrime),
+            Move::Down2 => {
+                self.apply_cube_move(CubeMove::Down);
+                self.apply_cube_move(CubeMove::Down);
+            },
+        }
+    }
+
+    fn apply_cube_move(&mut self, m: CubeMove) {
         self.corners.apply_move(m);
         self.edges.apply_move(m);
     }

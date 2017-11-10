@@ -1,5 +1,5 @@
 use cube::face::Face;
-use move_::Move;
+use cube::CubeMove;
 
 #[derive(Clone, Copy, Hash, Eq, PartialEq)]
 pub enum Edge {
@@ -111,23 +111,22 @@ impl Edges {
         self.orientations[usize::from(edges.0)] = (self.orientations[usize::from(edges.0)] + orients.0) % 2;
     }
 
-    pub fn apply_move(&mut self, m: Move) {
+    pub fn apply_move(&mut self, m: CubeMove) {
         use self::Edge::*;
 
         let (edges, orientations) = match m {
-            Move::Front => ((UF, RF, DF, LF), (0, 0, 0, 0)),
-            Move::FrontPrime => ((UF, LF, DF, RF), (0, 0, 0, 0)),
-            Move::Right => ((UR, RB, DR, RF), (1, 1, 1, 1)),
-            Move::RightPrime => ((UR, RF, DR, RB), (1, 1, 1, 1)),
-            Move::Up => ((UB, UR, UF, UL), (0, 0, 0, 0)),
-            Move::UpPrime => ((UB, UL, UF, UR), (0, 0, 0, 0)),
-            Move::Back => ((UB, LB, DB, RB), (0, 0, 0, 0)),
-            Move::BackPrime => ((UB, RB, DB, LB), (0, 0, 0, 0)),
-            Move::Left => ((UL, LF, DL, LB), (1, 1, 1, 1)),
-            Move::LeftPrime => ((UL, LB, DL, LF), (1, 1, 1, 1)),
-            Move::Down => ((DF, DR, DB, DL), (0, 0, 0, 0)),
-            Move::DownPrime => ((DF, DL, DB, DR), (0, 0, 0, 0)),
-            _ => unimplemented!(),
+            CubeMove::Front => ((UF, RF, DF, LF), (0, 0, 0, 0)),
+            CubeMove::FrontPrime => ((UF, LF, DF, RF), (0, 0, 0, 0)),
+            CubeMove::Right => ((UR, RB, DR, RF), (1, 1, 1, 1)),
+            CubeMove::RightPrime => ((UR, RF, DR, RB), (1, 1, 1, 1)),
+            CubeMove::Up => ((UB, UR, UF, UL), (0, 0, 0, 0)),
+            CubeMove::UpPrime => ((UB, UL, UF, UR), (0, 0, 0, 0)),
+            CubeMove::Back => ((UB, LB, DB, RB), (0, 0, 0, 0)),
+            CubeMove::BackPrime => ((UB, RB, DB, LB), (0, 0, 0, 0)),
+            CubeMove::Left => ((UL, LF, DL, LB), (1, 1, 1, 1)),
+            CubeMove::LeftPrime => ((UL, LB, DL, LF), (1, 1, 1, 1)),
+            CubeMove::Down => ((DF, DR, DB, DL), (0, 0, 0, 0)),
+            CubeMove::DownPrime => ((DF, DL, DB, DR), (0, 0, 0, 0)),
         };
 
         self.permute(edges);

@@ -1,5 +1,5 @@
 use cube::face::Face;
-use move_::Move;
+use cube::CubeMove;
 
 #[derive(Clone, Copy, Hash, Eq, PartialEq)]
 pub enum Corner {
@@ -118,23 +118,22 @@ impl Corners {
         self.orientations[usize::from(corners.0)] = (self.orientations[usize::from(corners.0)] + orients.0) % 3;
     }
 
-    pub fn apply_move(&mut self, m: Move) {
+    pub fn apply_move(&mut self, m: CubeMove) {
         use self::Corner::*;
 
         let (corners, orientations) = match m {
-            Move::Front => ((URF, DFR, DLF, UFL), (2, 1, 2, 1)),
-            Move::FrontPrime => ((URF, UFL, DLF, DFR), (2, 1, 2, 1)),
-            Move::Right => ((UBR, DRB, DFR, URF), (2, 1, 2, 1)),
-            Move::RightPrime => ((UBR, URF, DFR, DRB), (2, 1, 2, 1)),
-            Move::Up => ((URF, UFL, ULB, UBR), (0, 0, 0, 0)),
-            Move::UpPrime => ((URF, UBR, ULB, UFL), (0, 0, 0, 0)),
-            Move::Back => ((ULB, DBL, DRB, UBR), (2, 1, 2, 1)),
-            Move::BackPrime => ((ULB, UBR, DRB, DBL), (2, 1, 2, 1)),
-            Move::Left => ((UFL, DLF, DBL, ULB), (2, 1, 2, 1)),
-            Move::LeftPrime => ((UFL, ULB, DBL, DLF), (2, 1, 2, 1)),
-            Move::Down => ((DRB, DBL, DLF, DFR), (0, 0, 0, 0)),
-            Move::DownPrime => ((DRB, DFR, DLF, DBL), (0, 0, 0, 0)),
-            _ => unimplemented!(),
+            CubeMove::Front => ((URF, DFR, DLF, UFL), (2, 1, 2, 1)),
+            CubeMove::FrontPrime => ((URF, UFL, DLF, DFR), (2, 1, 2, 1)),
+            CubeMove::Right => ((UBR, DRB, DFR, URF), (2, 1, 2, 1)),
+            CubeMove::RightPrime => ((UBR, URF, DFR, DRB), (2, 1, 2, 1)),
+            CubeMove::Up => ((URF, UFL, ULB, UBR), (0, 0, 0, 0)),
+            CubeMove::UpPrime => ((URF, UBR, ULB, UFL), (0, 0, 0, 0)),
+            CubeMove::Back => ((ULB, DBL, DRB, UBR), (2, 1, 2, 1)),
+            CubeMove::BackPrime => ((ULB, UBR, DRB, DBL), (2, 1, 2, 1)),
+            CubeMove::Left => ((UFL, DLF, DBL, ULB), (2, 1, 2, 1)),
+            CubeMove::LeftPrime => ((UFL, ULB, DBL, DLF), (2, 1, 2, 1)),
+            CubeMove::Down => ((DRB, DBL, DLF, DFR), (0, 0, 0, 0)),
+            CubeMove::DownPrime => ((DRB, DFR, DLF, DBL), (0, 0, 0, 0)),
         };
 
         self.permute(corners);
