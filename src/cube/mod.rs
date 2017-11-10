@@ -161,3 +161,12 @@ impl Cube {
         print!("\r");
     }
 }
+
+impl Default for Cube {
+    fn default() -> Self {
+        Self {
+            corners: corners::Corners::default(),
+            edges: edges::Edges::default(),
+        }
+    }
+}
