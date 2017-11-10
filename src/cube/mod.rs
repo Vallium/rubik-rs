@@ -9,6 +9,7 @@ use cube::cube_move::CubeMove;
 use cube::corners::Corners;
 use cube::edges::Edges;
 
+#[derive(Eq, PartialEq)]
 pub struct Cube {
     corners: Corners,
     edges: Edges,
@@ -28,10 +29,7 @@ impl Cube {
     }
 
     pub fn is_solved(&self) -> bool {
-        if self.corners == Corners::default() && self.edges == Edges::default() {
-            return true
-        }
-        false
+        *self == Self::default()
     }
 
     pub fn apply_move(&mut self, m: Move) {
