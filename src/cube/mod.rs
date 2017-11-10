@@ -16,14 +16,16 @@ pub struct Cube {
 }
 
 impl Cube {
-    pub fn from_shuffle_sequence(shuffle_sequence: &Vec<Move>) -> Self {
+    pub fn from_shuffle_sequence<I>(shuffle_sequence: I) -> Self
+        where I: IntoIterator<Item=Move>
+    {
         let mut new  = Self {
             corners: Corners::new(),
             edges: Edges::new(),
             };
 
-        for m in shuffle_sequence {
-            new.apply_move(*m);
+        for m in shuffle_sequence.into_iter() {
+            new.apply_move(m);
         }
         new
     }
