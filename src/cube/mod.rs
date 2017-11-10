@@ -10,26 +10,21 @@ use cube::corners::Corners;
 use cube::edges::Edges;
 
 pub struct Cube {
-    shuffle_sequence: Vec<Move>,
     corners: Corners,
     edges: Edges,
 }
 
 impl Cube {
-    pub fn new() -> Self {
-        Self {
-            shuffle_sequence: Vec::new(),
-            corners: Corners::new(),
-            edges: Edges::new(),
-        }
-    }
-
     pub fn from_shuffle_sequence(shuffle_sequence: &Vec<Move>) -> Self {
-        Self {
-            shuffle_sequence: (*shuffle_sequence).clone(),
+        let mut new  = Self {
             corners: Corners::new(),
             edges: Edges::new(),
+            };
+
+        for m in shuffle_sequence {
+            new.apply_move(*m);
         }
+        new
     }
 
     pub fn is_solved(&self) -> bool {
