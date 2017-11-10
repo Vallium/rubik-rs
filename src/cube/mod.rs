@@ -85,7 +85,7 @@ impl Cube {
         self.edges.apply_move(m);
     }
 
-    fn get_face(&self, face: Face) -> [Face; 9] {
+    fn face(&self, face: Face) -> [Face; 9] {
         use self::corners::Corner::*;
         let corners = match face {
             Face::F => [UFL, URF, DFR, DLF],
@@ -101,7 +101,7 @@ impl Cube {
         for (i, c) in (&corners).iter().enumerate() {
             let corner_cubie: corners::Corner = self.corners.permutations[usize::from(*c)];
 
-            corner_faces[i] = corner_cubie.get_face(*c, self.corners.orientations[usize::from(*c)], face);
+            corner_faces[i] = corner_cubie.face(*c, self.corners.orientations[usize::from(*c)], face);
         }
 
         use self::edges::Edge::*;
@@ -119,7 +119,7 @@ impl Cube {
         for (i, e) in (&edges).iter().enumerate() {
             let edge_cubie: edges::Edge = self.edges.permutations[usize::from(*e)];
 
-            edge_faces[i] = edge_cubie.get_face(*e, self.edges.orientations[usize::from(*e)], face);
+            edge_faces[i] = edge_cubie.face(*e, self.edges.orientations[usize::from(*e)], face);
         }
 
         [corner_faces[0], edge_faces[0], corner_faces[1],
@@ -129,12 +129,12 @@ impl Cube {
 
     pub fn print(&self) {
         let faces = [
-            self.get_face(self::Face::U),
-            self.get_face(self::Face::L),
-            self.get_face(self::Face::F),
-            self.get_face(self::Face::R),
-            self.get_face(self::Face::B),
-            self.get_face(self::Face::D),
+            self.face(self::Face::U),
+            self.face(self::Face::L),
+            self.face(self::Face::F),
+            self.face(self::Face::R),
+            self.face(self::Face::B),
+            self.face(self::Face::D),
         ];
 
         print!("\n         ");

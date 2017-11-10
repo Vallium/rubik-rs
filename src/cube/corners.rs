@@ -38,7 +38,7 @@ impl Corner {
         }
     }
 
-    pub fn get_face(&self, cubicle: Corner, orientation: u8, face: Face) -> Face {
+    pub fn face(&self, cubicle: Corner, orientation: u8, face: Face) -> Face {
         let (oriented_a, oriented_b, oriented_c) = (*self).orient(orientation);
         let (a, b, _c) = cubicle.decompose();
 

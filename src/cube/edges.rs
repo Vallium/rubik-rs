@@ -45,7 +45,7 @@ impl Edge {
         }
     }
 
-    pub fn get_face(&self, cubicle: Edge, orientation: u8, face: Face) -> Face {
+    pub fn face(&self, cubicle: Edge, orientation: u8, face: Face) -> Face {
         let (oriented_a, oriented_b) = (*self).orient(orientation);
         let (a, _b) = cubicle.decompose();
 
