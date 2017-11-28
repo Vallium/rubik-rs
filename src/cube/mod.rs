@@ -132,33 +132,34 @@ impl Cube {
             self.face(self::Face::D),
         ];
 
-        print!("\n         ");
+        print!("          ");
         for i in 0..9 {
             print!("{} {} \x1b[0m", faces[0][i].color(), faces[0][i].to_string());
-            if i > 0 && (i+1) % 3 == 0 {
-                print!("\n         ");
+            if i > 0 && (i+1) % 3 == 0 && i != 8 {
+                print!("\n          ");
             }
         }
-        print!("\r");
+        println!("\n");
         for y in 0..3 {
             for &face in &faces {
                 if face[4] != self::Face::U && face[4] != self::Face::D {
                     for x in 0..3 {
                         print!("{} {} \x1b[0m", face[x+y*3].color(), face[x+y*3].to_string());
                     }
+                    print!(" ");
                 }
             }
-            print!("\n");
+            println!();
         }
-        print!("         ");
+        println!();
+        print!("          ");
         for i in 0..9 {
             print!("{} {} \x1b[0m", faces[5][i].color(), faces[5][i].to_string());
-
-            if i > 0 && (i+1) % 3 == 0 {
-                print!("\n         ");
+            if i > 0 && (i+1) % 3 == 0 && i != 8 {
+                print!("\n          ");
             }
         }
-        print!("\r");
+        println!();
     }
 }
 
