@@ -149,7 +149,7 @@ impl Cube {
                     print!(" ");
                 }
             }
-            print!("\n");
+            println!();
         }
         print!("\n          ");
         for i in 0..9 {
@@ -159,7 +159,7 @@ impl Cube {
                 print!("\n          ");
             }
         }
-        print!("\r");
+        println!();
     }
 }
 
