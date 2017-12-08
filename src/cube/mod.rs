@@ -19,7 +19,7 @@ impl Cube {
     pub fn from_shuffle_sequence<I>(shuffle_sequence: I) -> Self
         where I: IntoIterator<Item=Move>
     {
-        let mut new  = Self {
+        let mut new = Self {
             corners: Corners::new(),
             edges: Edges::new(),
             };
@@ -171,3 +171,25 @@ impl Default for Cube {
         }
     }
 }
+
+    /// Binomial coefficient [n choose k].
+    pub fn cnk(n: i8, mut k: i8) -> i8 {
+        if n < k {
+            return 0;
+        }
+        if k > n / 2 {
+            k = n - k;
+        }
+
+        let mut i: i8 = n;
+        let mut j: i8 = 1;
+        let mut s: i8 = 1;
+
+        while i != n - k {
+            s *= i;
+            s /= j;
+            j += 1;
+            i -= 1;
+        }
+        s
+    }
