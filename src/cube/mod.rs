@@ -8,6 +8,7 @@ use cube::face::Face;
 use cube::cube_move::CubeMove;
 use cube::corners::Corners;
 use cube::edges::Edges;
+use cube::corners::Corner;
 
 #[derive(Eq, PartialEq)]
 pub struct Cube {
@@ -32,6 +33,21 @@ impl Cube {
 
     pub fn is_solved(&self) -> bool {
         *self == Self::default()
+    }
+
+    pub fn get_twist(&self) -> u32 {
+        let mut ret: u32 = 0;
+
+        for x in usize::from(Corner::URF)..usize::from(Corner::DRB) {
+            ret += 3 * ret + self.corners.orientations[x] as u32;
+            println!("{}", self.corners.orientations[x]);
+         }
+         ret
+        // short ret = 0;
+        // for (int i = (int)Corners::URF; i < (int)Corners::DRB; i++){
+        //     ret = (short) (3 * ret + this->cornerOrientation[i]);
+        //  }
+    // return ret;
     }
 
     pub fn apply_move(&mut self, m: Move) {
