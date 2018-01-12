@@ -1,14 +1,14 @@
 mod face;
-mod cube_move;
-mod corners;
-mod edges;
+// mod cube_move;
+pub mod corners;
+pub mod edges;
 
-use move_::Move;
 use cube::face::Face;
-use cube::cube_move::CubeMove;
+// use cube::cube_move::CubeMove;
 use cube::corners::Corners;
-use cube::edges::Edges;
 use cube::corners::Corner;
+use cube::edges::Edges;
+use move_::Move;
 
 #[derive(Eq, PartialEq)]
 pub struct Cube {
@@ -25,14 +25,24 @@ impl Cube {
             edges: Edges::new(),
             };
 
-        for m in shuffle_sequence.into_iter() {
-            new.apply_move(m);
-        }
+        // for m in shuffle_sequence.into_iter() {
+        //     // new.apply_move(m);
+        // }
         new
     }
 
+    pub fn new_default() -> Self {
+        Self::default()
+    }
+
+
     pub fn is_solved(&self) -> bool {
         *self == Self::default()
+    }
+
+    pub fn multiply(&mut self) {
+        self.corners.corners_multiply(Move::Left);
+        self.edges.edges_multiply(Move::Left);
     }
 
     pub fn get_twist(&self) -> u32 {
@@ -42,59 +52,55 @@ impl Cube {
             ret += 3 * ret + self.corners.orientations[x] as u32;
             println!("{}", self.corners.orientations[x]);
          }
+         println!("twist: {}", ret);
          ret
-        // short ret = 0;
-        // for (int i = (int)Corners::URF; i < (int)Corners::DRB; i++){
-        //     ret = (short) (3 * ret + this->cornerOrientation[i]);
-        //  }
-    // return ret;
     }
 
-    pub fn apply_move(&mut self, m: Move) {
-        match m {
-            Move::Front => self.apply_cube_move(CubeMove::Front),
-            Move::FrontPrime => self.apply_cube_move(CubeMove::FrontPrime),
-            Move::Front2 => {
-                self.apply_cube_move(CubeMove::Front);
-                self.apply_cube_move(CubeMove::Front);
-            },
-            Move::Right => self.apply_cube_move(CubeMove::Right),
-            Move::RightPrime => self.apply_cube_move(CubeMove::RightPrime),
-            Move::Right2 => {
-                self.apply_cube_move(CubeMove::Right);
-                self.apply_cube_move(CubeMove::Right);
-            },
-            Move::Up => self.apply_cube_move(CubeMove::Up),
-            Move::UpPrime => self.apply_cube_move(CubeMove::UpPrime),
-            Move::Up2 => {
-                self.apply_cube_move(CubeMove::Up);
-                self.apply_cube_move(CubeMove::Up);
-            },
-            Move::Back => self.apply_cube_move(CubeMove::Back),
-            Move::BackPrime => self.apply_cube_move(CubeMove::BackPrime),
-            Move::Back2 => {
-                self.apply_cube_move(CubeMove::Back);
-                self.apply_cube_move(CubeMove::Back);
-            },
-            Move::Left => self.apply_cube_move(CubeMove::Left),
-            Move::LeftPrime => self.apply_cube_move(CubeMove::LeftPrime),
-            Move::Left2 => {
-                self.apply_cube_move(CubeMove::Left);
-                self.apply_cube_move(CubeMove::Left);
-            },
-            Move::Down => self.apply_cube_move(CubeMove::Down),
-            Move::DownPrime => self.apply_cube_move(CubeMove::DownPrime),
-            Move::Down2 => {
-                self.apply_cube_move(CubeMove::Down);
-                self.apply_cube_move(CubeMove::Down);
-            },
-        }
-    }
+    // pub fn apply_move(&mut self, m: Move) {
+    //     match m {
+    //         Move::Front => self.apply_cube_move(CubeMove::Front),
+    //         Move::FrontPrime => self.apply_cube_move(CubeMove::FrontPrime),
+    //         Move::Front2 => {
+    //             self.apply_cube_move(CubeMove::Front);
+    //             self.apply_cube_move(CubeMove::Front);
+    //         },
+    //         Move::Right => self.apply_cube_move(CubeMove::Right),
+    //         Move::RightPrime => self.apply_cube_move(CubeMove::RightPrime),
+    //         Move::Right2 => {
+    //             self.apply_cube_move(CubeMove::Right);
+    //             self.apply_cube_move(CubeMove::Right);
+    //         },
+    //         Move::Up => self.apply_cube_move(CubeMove::Up),
+    //         Move::UpPrime => self.apply_cube_move(CubeMove::UpPrime),
+    //         Move::Up2 => {
+    //             self.apply_cube_move(CubeMove::Up);
+    //             self.apply_cube_move(CubeMove::Up);
+    //         },
+    //         Move::Back => self.apply_cube_move(CubeMove::Back),
+    //         Move::BackPrime => self.apply_cube_move(CubeMove::BackPrime),
+    //         Move::Back2 => {
+    //             self.apply_cube_move(CubeMove::Back);
+    //             self.apply_cube_move(CubeMove::Back);
+    //         },
+    //         Move::Left => self.apply_cube_move(CubeMove::Left),
+    //         Move::LeftPrime => self.apply_cube_move(CubeMove::LeftPrime),
+    //         Move::Left2 => {
+    //             self.apply_cube_move(CubeMove::Left);
+    //             self.apply_cube_move(CubeMove::Left);
+    //         },
+    //         Move::Down => self.apply_cube_move(CubeMove::Down),
+    //         Move::DownPrime => self.apply_cube_move(CubeMove::DownPrime),
+    //         Move::Down2 => {
+    //             self.apply_cube_move(CubeMove::Down);
+    //             self.apply_cube_move(CubeMove::Down);
+    //         },
+    //     }
+    // }
 
-    fn apply_cube_move(&mut self, m: CubeMove) {
-        self.corners.apply_move(m);
-        self.edges.apply_move(m);
-    }
+    // fn apply_cube_move(&mut self, m: CubeMove) {
+    //     self.corners.apply_move(m);
+    //     self.edges.apply_move(m);
+    // }
 
     fn face(&self, face: Face) -> [Face; 9] {
         use self::corners::Corner::*;
@@ -117,12 +123,12 @@ impl Cube {
 
         use self::edges::Edge::*;
         let edges = match face {
-            Face::F => [UF, RF, DF, LF],
-            Face::B => [UB, LB, DB, RB],
+            Face::F => [UF, FR, DF, FL],
+            Face::B => [UB, BL, DB, BR],
             Face::U => [UB, UR, UF, UL],
             Face::D => [DF, DR, DB, DL],
-            Face::L => [UL, LF, DL, LB],
-            Face::R => [UR, RB, DR, RF],
+            Face::L => [UL, FL, DL, BL],
+            Face::R => [UR, BR, DR, FR],
         };
 
         let mut edge_faces: [self::Face; 4] = [self::Face::F; 4];
@@ -188,24 +194,24 @@ impl Default for Cube {
     }
 }
 
-    /// Binomial coefficient [n choose k].
-    pub fn cnk(n: i8, mut k: i8) -> i8 {
-        if n < k {
-            return 0;
-        }
-        if k > n / 2 {
-            k = n - k;
-        }
-
-        let mut i: i8 = n;
-        let mut j: i8 = 1;
-        let mut s: i8 = 1;
-
-        while i != n - k {
-            s *= i;
-            s /= j;
-            j += 1;
-            i -= 1;
-        }
-        s
+/// Binomial coefficient [n choose k].
+pub fn cnk(n: i8, mut k: i8) -> i8 {
+    if n < k {
+        return 0;
     }
+    if k > n / 2 {
+        k = n - k;
+    }
+
+    let mut i: i8 = n;
+    let mut j: i8 = 1;
+    let mut s: i8 = 1;
+
+    while i != n - k {
+        s *= i;
+        s /= j;
+        j += 1;
+        i -= 1;
+    }
+    s
+}

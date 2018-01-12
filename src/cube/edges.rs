@@ -1,5 +1,7 @@
 use cube::face::Face;
-use cube::CubeMove;
+// use cube::CubeMove;
+use move_::Move;
+use move_::Move_;
 
 #[derive(Clone, Copy, Hash, Eq, PartialEq)]
 pub enum Edge {
@@ -11,10 +13,10 @@ pub enum Edge {
     DF,
     DL,
     DB,
-    RF,
-    LF,
-    RB,
-    LB,
+    FR,
+    FL,
+    BR,
+    BL,
 }
 
 impl Edge {
@@ -29,10 +31,10 @@ impl Edge {
             DF => (Face::D, Face::F),
             DL => (Face::D, Face::L),
             DB => (Face::D, Face::B),
-            RF => (Face::R, Face::F),
-            LF => (Face::L, Face::F),
-            RB => (Face::R, Face::B),
-            LB => (Face::L, Face::B),
+            FR => (Face::F, Face::R),
+            FL => (Face::F, Face::L),
+            BR => (Face::B, Face::R),
+            BL => (Face::B, Face::L),
         }
     }
 
@@ -69,10 +71,10 @@ impl From<Edge> for usize {
             DF => 5,
             DL => 6,
             DB => 7,
-            RF => 8,
-            LF => 9,
-            RB => 10,
-            LB => 11,
+            FR => 8,
+            FL => 9,
+            BR => 10,
+            BL => 11,
         }
     }
 }
@@ -88,49 +90,17 @@ impl Edges {
         Edges::default()
     }
 
-    fn permute(&mut self, edges: (self::Edge, self::Edge, self::Edge, self::Edge)) {
-        let tmp = self.permutations[usize::from(edges.3)];
+    pub fn edges_multiply(&mut self, m: Move) {
+        let m = Move_::move_definition(m);
+        let mut new_edges = Self::new();
 
-        self.permutations[usize::from(edges.3)] = self.permutations[usize::from(edges.2)];
-        self.permutations[usize::from(edges.2)] = self.permutations[usize::from(edges.1)];
-        self.permutations[usize::from(edges.1)] = self.permutations[usize::from(edges.0)];
-        self.permutations[usize::from(edges.0)] = tmp;
-    }
+        for edge in usize::from(Edge::UR)..usize::from(Edge::BL) + 1 {
+            let index = usize::from(m.edges_permutation[edge]);
 
-    fn orient(&mut self, edges: (self::Edge, self::Edge, self::Edge, self::Edge), orients: (u8, u8, u8, u8)) {
-        let tmp = self.orientations[usize::from(edges.3)];
-
-        self.orientations[usize::from(edges.3)] = self.orientations[usize::from(edges.2)];
-        self.orientations[usize::from(edges.2)] = self.orientations[usize::from(edges.1)];
-        self.orientations[usize::from(edges.1)] = self.orientations[usize::from(edges.0)];
-        self.orientations[usize::from(edges.0)] = tmp;
-
-        self.orientations[usize::from(edges.3)] = (self.orientations[usize::from(edges.3)] + orients.3) % 2;
-        self.orientations[usize::from(edges.2)] = (self.orientations[usize::from(edges.2)] + orients.2) % 2;
-        self.orientations[usize::from(edges.1)] = (self.orientations[usize::from(edges.1)] + orients.1) % 2;
-        self.orientations[usize::from(edges.0)] = (self.orientations[usize::from(edges.0)] + orients.0) % 2;
-    }
-
-    pub fn apply_move(&mut self, m: CubeMove) {
-        use self::Edge::*;
-
-        let (edges, orientations) = match m {
-            CubeMove::Front => ((UF, RF, DF, LF), (0, 0, 0, 0)),
-            CubeMove::FrontPrime => ((UF, LF, DF, RF), (0, 0, 0, 0)),
-            CubeMove::Right => ((UR, RB, DR, RF), (1, 1, 1, 1)),
-            CubeMove::RightPrime => ((UR, RF, DR, RB), (1, 1, 1, 1)),
-            CubeMove::Up => ((UB, UR, UF, UL), (0, 0, 0, 0)),
-            CubeMove::UpPrime => ((UB, UL, UF, UR), (0, 0, 0, 0)),
-            CubeMove::Back => ((UB, LB, DB, RB), (0, 0, 0, 0)),
-            CubeMove::BackPrime => ((UB, RB, DB, LB), (0, 0, 0, 0)),
-            CubeMove::Left => ((UL, LF, DL, LB), (1, 1, 1, 1)),
-            CubeMove::LeftPrime => ((UL, LB, DL, LF), (1, 1, 1, 1)),
-            CubeMove::Down => ((DF, DR, DB, DL), (0, 0, 0, 0)),
-            CubeMove::DownPrime => ((DF, DL, DB, DR), (0, 0, 0, 0)),
-        };
-
-        self.permute(edges);
-        self.orient(edges, orientations);
+            new_edges.permutations[edge] = self.permutations[index];
+            new_edges.orientations[edge] = (m.edges_orientation[edge] + self.orientations[index]) % 2;
+        }
+        *self = new_edges;
     }
 }
 
@@ -147,10 +117,10 @@ impl Default for Edges {
         edges[usize::from(DF)] = DF;
         edges[usize::from(DL)] = DL;
         edges[usize::from(DB)] = DB;
-        edges[usize::from(RF)] = RF;
-        edges[usize::from(LF)] = LF;
-        edges[usize::from(RB)] = RB;
-        edges[usize::from(LB)] = LB;
+        edges[usize::from(FR)] = FR;
+        edges[usize::from(FL)] = FL;
+        edges[usize::from(BR)] = BR;
+        edges[usize::from(BL)] = BL;
 
         Self {
             permutations: edges,

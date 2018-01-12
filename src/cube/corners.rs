@@ -1,5 +1,7 @@
 use cube::face::Face;
-use cube::CubeMove;
+// use cube::CubeMove;
+use move_::Move;
+use move_::Move_;
 
 #[derive(Clone, Copy, Hash, Eq, PartialEq)]
 pub enum Corner {
@@ -95,49 +97,34 @@ impl Corners {
         Corners::default()
     }
 
-    fn permute(&mut self, corners: (self::Corner, self::Corner, self::Corner, self::Corner)) {
-        let tmp = self.permutations[usize::from(corners.3)];
+    pub fn corners_multiply(&mut self, m: Move) {
+        let m = Move_::move_definition(m);
+        let mut new_corners = Self::new();
 
-        self.permutations[usize::from(corners.3)] = self.permutations[usize::from(corners.2)];
-        self.permutations[usize::from(corners.2)] = self.permutations[usize::from(corners.1)];
-        self.permutations[usize::from(corners.1)] = self.permutations[usize::from(corners.0)];
-        self.permutations[usize::from(corners.0)] = tmp;
-    }
+        for corner in usize::from(Corner::URF)..usize::from(Corner::DRB) + 1 {
+            let index = usize::from(m.corners_permutation[corner]);
+            new_corners.permutations[corner] = self.permutations[index];
 
-    fn orient(&mut self, corners: (self::Corner, self::Corner, self::Corner, self::Corner), orients: (u8, u8, u8, u8)) {
-        let tmp = self.orientations[usize::from(corners.3)];
+            let ori_a  = self.orientations[index];
+            let ori_b  = m.corners_orientation[corner];
+            let mut ori = 0;
 
-        self.orientations[usize::from(corners.3)] = self.orientations[usize::from(corners.2)];
-        self.orientations[usize::from(corners.2)] = self.orientations[usize::from(corners.1)];
-        self.orientations[usize::from(corners.1)] = self.orientations[usize::from(corners.0)];
-        self.orientations[usize::from(corners.0)] = tmp;
-
-        self.orientations[usize::from(corners.3)] = (self.orientations[usize::from(corners.3)] + orients.3) % 3;
-        self.orientations[usize::from(corners.2)] = (self.orientations[usize::from(corners.2)] + orients.2) % 3;
-        self.orientations[usize::from(corners.1)] = (self.orientations[usize::from(corners.1)] + orients.1) % 3;
-        self.orientations[usize::from(corners.0)] = (self.orientations[usize::from(corners.0)] + orients.0) % 3;
-    }
-
-    pub fn apply_move(&mut self, m: CubeMove) {
-        use self::Corner::*;
-
-        let (corners, orientations) = match m {
-            CubeMove::Front => ((URF, DFR, DLF, UFL), (2, 1, 2, 1)),
-            CubeMove::FrontPrime => ((URF, UFL, DLF, DFR), (2, 1, 2, 1)),
-            CubeMove::Right => ((UBR, DRB, DFR, URF), (2, 1, 2, 1)),
-            CubeMove::RightPrime => ((UBR, URF, DFR, DRB), (2, 1, 2, 1)),
-            CubeMove::Up => ((URF, UFL, ULB, UBR), (0, 0, 0, 0)),
-            CubeMove::UpPrime => ((URF, UBR, ULB, UFL), (0, 0, 0, 0)),
-            CubeMove::Back => ((ULB, DBL, DRB, UBR), (2, 1, 2, 1)),
-            CubeMove::BackPrime => ((ULB, UBR, DRB, DBL), (2, 1, 2, 1)),
-            CubeMove::Left => ((UFL, DLF, DBL, ULB), (2, 1, 2, 1)),
-            CubeMove::LeftPrime => ((UFL, ULB, DBL, DLF), (2, 1, 2, 1)),
-            CubeMove::Down => ((DRB, DBL, DLF, DFR), (0, 0, 0, 0)),
-            CubeMove::DownPrime => ((DRB, DFR, DLF, DBL), (0, 0, 0, 0)),
-        };
-
-        self.permute(corners);
-        self.orient(corners, orientations);
+            if ori_a < 3 && ori_b < 3 {
+                ori = ori_a + ori_b;
+                if ori >= 3 { ori -= 3; }
+            } else if ori_a < 3 && ori_b >= 3 {
+                ori = ori_a + ori_b;
+                if ori >= 6 { ori -= 3; }
+            } else if ori_a >= 3 && ori_b < 3 {
+                ori = ori_a - ori_b;
+                if ori < 3 { ori += 3; }
+            } else if ori_a >= 3 && ori_b >= 3 {
+                ori = ori_a - ori_b;
+                // if ori < 0 { ori += 3; }
+            }
+            new_corners.orientations[corner] = ori;
+        }
+        *self = new_corners;
     }
 }
 
