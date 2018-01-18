@@ -4,7 +4,7 @@ mod coordinate;
 mod solver;
 
 use std::env;
-// use move_::Move;
+use move_::UserMove;
 use cube::Cube;
 use coordinate::Coordinate;
 use solver::Solver;
@@ -16,15 +16,13 @@ fn main() {
             println!("Usage")
         }
         Some(arg) => {
-            // if let Ok(shuffle_sequence) = Move::sequence_from_str(&arg) {
-                // let cube = Cube::from_shuffle_sequence(shuffle_sequence);
-                let cube = Cube::new_default();
-                // cube.multiply();
+            if let Ok(shuffle_sequence) = UserMove::sequence_from_str(&arg) {
+                let cube = Cube::from_shuffle_sequence(shuffle_sequence);
                 let coordinate = Coordinate::from_cube(&cube);
                 let solver = Solver::new(cube);
 
                 solver.solve();
-            // }
+            }
         }
     }
 }

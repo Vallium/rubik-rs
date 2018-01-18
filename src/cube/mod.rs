@@ -1,14 +1,13 @@
 mod face;
-// mod cube_move;
 pub mod corners;
 pub mod edges;
 
 use cube::face::Face;
-// use cube::cube_move::CubeMove;
 use cube::corners::Corners;
 use cube::corners::Corner;
 use cube::edges::Edges;
 use move_::Move;
+use move_::UserMove;
 
 #[derive(Eq, PartialEq)]
 pub struct Cube {
@@ -18,16 +17,19 @@ pub struct Cube {
 
 impl Cube {
     pub fn from_shuffle_sequence<I>(shuffle_sequence: I) -> Self
-        where I: IntoIterator<Item=Move>
+        where I: IntoIterator<Item=(UserMove, usize)>
     {
         let mut new = Self {
             corners: Corners::new(),
             edges: Edges::new(),
             };
 
-        // for m in shuffle_sequence.into_iter() {
-        //     // new.apply_move(m);
-        // }
+        for m in shuffle_sequence.into_iter() {
+            let mprime = m.1;
+            for _ in 0..mprime {
+                new.apply_move(m.0.to_move());
+            }
+        }
         new
     }
 
@@ -40,9 +42,9 @@ impl Cube {
         *self == Self::default()
     }
 
-    pub fn multiply(&mut self) {
-        self.corners.corners_multiply(Move::Left);
-        self.edges.edges_multiply(Move::Left);
+    pub fn multiply(&mut self, m: Move) {
+        self.corners.corners_multiply(m);
+        self.edges.edges_multiply(m);
     }
 
     pub fn get_twist(&self) -> u32 {
@@ -56,51 +58,17 @@ impl Cube {
          ret
     }
 
-    // pub fn apply_move(&mut self, m: Move) {
-    //     match m {
-    //         Move::Front => self.apply_cube_move(CubeMove::Front),
-    //         Move::FrontPrime => self.apply_cube_move(CubeMove::FrontPrime),
-    //         Move::Front2 => {
-    //             self.apply_cube_move(CubeMove::Front);
-    //             self.apply_cube_move(CubeMove::Front);
-    //         },
-    //         Move::Right => self.apply_cube_move(CubeMove::Right),
-    //         Move::RightPrime => self.apply_cube_move(CubeMove::RightPrime),
-    //         Move::Right2 => {
-    //             self.apply_cube_move(CubeMove::Right);
-    //             self.apply_cube_move(CubeMove::Right);
-    //         },
-    //         Move::Up => self.apply_cube_move(CubeMove::Up),
-    //         Move::UpPrime => self.apply_cube_move(CubeMove::UpPrime),
-    //         Move::Up2 => {
-    //             self.apply_cube_move(CubeMove::Up);
-    //             self.apply_cube_move(CubeMove::Up);
-    //         },
-    //         Move::Back => self.apply_cube_move(CubeMove::Back),
-    //         Move::BackPrime => self.apply_cube_move(CubeMove::BackPrime),
-    //         Move::Back2 => {
-    //             self.apply_cube_move(CubeMove::Back);
-    //             self.apply_cube_move(CubeMove::Back);
-    //         },
-    //         Move::Left => self.apply_cube_move(CubeMove::Left),
-    //         Move::LeftPrime => self.apply_cube_move(CubeMove::LeftPrime),
-    //         Move::Left2 => {
-    //             self.apply_cube_move(CubeMove::Left);
-    //             self.apply_cube_move(CubeMove::Left);
-    //         },
-    //         Move::Down => self.apply_cube_move(CubeMove::Down),
-    //         Move::DownPrime => self.apply_cube_move(CubeMove::DownPrime),
-    //         Move::Down2 => {
-    //             self.apply_cube_move(CubeMove::Down);
-    //             self.apply_cube_move(CubeMove::Down);
-    //         },
-    //     }
-    // }
-
-    // fn apply_cube_move(&mut self, m: CubeMove) {
-    //     self.corners.apply_move(m);
-    //     self.edges.apply_move(m);
-    // }
+    pub fn apply_move(&mut self, m: Move) {
+        use move_::Move::*;
+        match m {
+            Move::Front => self.multiply(Front),
+            Move::Right => self.multiply(Right),
+            Move::Up => self.multiply(Up),
+            Move::Back => self.multiply(Back),
+            Move::Left => self.multiply(Left),
+            Move::Down => self.multiply(Down),
+        }
+    }
 
     fn face(&self, face: Face) -> [Face; 9] {
         use self::corners::Corner::*;

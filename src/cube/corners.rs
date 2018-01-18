@@ -35,8 +35,8 @@ impl Corner {
 
         match orientation {
             0 => (a, b, c),
-            1 => (b, c, a),
-            _ => (c, a, b),
+            1 => (c, a, b),
+            _ => (b, c, a),
         }
     }
 
@@ -105,9 +105,9 @@ impl Corners {
             let index = usize::from(m.corners_permutation[corner]);
             new_corners.permutations[corner] = self.permutations[index];
 
-            let ori_a  = self.orientations[index];
-            let ori_b  = m.corners_orientation[corner];
-            let mut ori = 0;
+            let ori_a: i8  = self.orientations[index] as i8;
+            let ori_b: i8  = m.corners_orientation[corner] as i8;
+            let mut ori: i8 = 0;
 
             if ori_a < 3 && ori_b < 3 {
                 ori = ori_a + ori_b;
@@ -120,9 +120,9 @@ impl Corners {
                 if ori < 3 { ori += 3; }
             } else if ori_a >= 3 && ori_b >= 3 {
                 ori = ori_a - ori_b;
-                // if ori < 0 { ori += 3; }
+                if ori < 0 { ori += 3; }
             }
-            new_corners.orientations[corner] = ori;
+            new_corners.orientations[corner] = ori as u8;
         }
         *self = new_corners;
     }

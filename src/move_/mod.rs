@@ -1,6 +1,7 @@
 use cube::corners::Corner;
 use cube::edges::Edge;
 
+#[derive(Clone, Copy)]
 pub enum Move {
     Up,
     Right,
@@ -63,86 +64,96 @@ impl Move_ {
     }
 }
 
+#[derive(Clone, Copy)]
+pub enum UserMove {
+    Front,
+    FrontPrime,
+    Front2,
+    Right,
+    RightPrime,
+    Right2,
+    Up,
+    UpPrime,
+    Up2,
+    Back,
+    BackPrime,
+    Back2,
+    Left,
+    LeftPrime,
+    Left2,
+    Down,
+    DownPrime,
+    Down2,
+}
 
-// use self::Move::*;
+impl UserMove {
+    pub fn sequence_from_str(s: &str) -> Result<Vec<(Self, usize)>, ()> {
+        let mut sequence = Vec::new();
+        let splitted = s.split_whitespace();
 
-// #[derive(Clone, Copy)]
-// pub enum Move {
-//     Front,
-//     FrontPrime,
-//     Front2,
-//     Right,
-//     RightPrime,
-//     Right2,
-//     Up,
-//     UpPrime,
-//     Up2,
-//     Back,
-//     BackPrime,
-//     Back2,
-//     Left,
-//     LeftPrime,
-//     Left2,
-//     Down,
-//     DownPrime,
-//     Down2,
-// }
+        use self::UserMove::*;
+        for elem in splitted {
+            let move_ =  match elem {
+                "F" => (Front, 1),
+                "F'" => (FrontPrime, 3),
+                "F2" => (Front2, 2),
+                "R" => (Right, 1),
+                "R'" => (RightPrime, 3),
+                "R2" => (Right2, 2),
+                "U" => (Up, 1),
+                "U'" => (UpPrime, 3),
+                "U2" => (Up2, 2),
+                "B" => (Back, 1),
+                "B'" => (BackPrime, 3),
+                "B2" => (Back2, 2),
+                "L" => (Left, 1),
+                "L'" => (LeftPrime, 3),
+                "L2" => (Left2, 2),
+                "D" => (Down, 1),
+                "D'" => (DownPrime, 3),
+                "D2" => (Down2, 2),
+                _ => return Err(()),
+            };
+            sequence.push(move_)
+        }
+        Ok(sequence)
+    }
 
-// impl Move {
-//     pub fn sequence_from_str(s: &str) -> Result<Vec<Self>, ()> {
-//         let mut sequence = Vec::new();
-//         let splitted = s.split_whitespace();
+    pub fn to_move(&self) -> Move {
+        match *self {
+            UserMove::Front | UserMove::FrontPrime | UserMove::Front2 => Move::Front,
+            UserMove::Right | UserMove::RightPrime | UserMove::Right2 => Move::Right,
+            UserMove::Up | UserMove::UpPrime | UserMove::Up2 => Move::Up,
+            UserMove::Back | UserMove::BackPrime | UserMove::Back2 => Move::Back,
+            UserMove::Left | UserMove::LeftPrime | UserMove::Left2 => Move::Left,
+            UserMove::Down | UserMove::DownPrime | UserMove::Down2 => Move::Down,
+        }
+    }
+}
 
-//         for elem in splitted {
-//             let move_ =  match elem {
-//                 "F" => Front,
-//                 "F'" => FrontPrime,
-//                 "F2" => Front2,
-//                 "R" => Right,
-//                 "R'" => RightPrime,
-//                 "R2" => Right2,
-//                 "U" => Up,
-//                 "U'" => UpPrime,
-//                 "U2" => Up2,
-//                 "B" => Back,
-//                 "B'" => BackPrime,
-//                 "B2" => Back2,
-//                 "L" => Left,
-//                 "L'" => LeftPrime,
-//                 "L2" => Left2,
-//                 "D" => Down,
-//                 "D'" => DownPrime,
-//                 "D2" => Down2,
-//                 _ => return Err(()),
-//             };
-//             sequence.push(move_)
-//         }
-//         Ok(sequence)
-//     }
-// }
-
-// impl ToString for Move {
-//     fn to_string(&self) -> String {
-//         let string = match *self {
-//             Front => "F",
-//             FrontPrime => "F'",
-//             Front2 => "F2",
-//             Right => "R",
-//             RightPrime => "R'",
-//             Right2 => "R2",
-//             Up => "U",
-//             UpPrime => "U'",
-//             Up2 => "U2",
-//             Back => "B",
-//             BackPrime => "B'",
-//             Back2 => "B2",
-//             Left => "L",
-//             LeftPrime => "L'",
-//             Left2 => "L2",
-//             Down => "D",
-//             DownPrime => "D'",
-//             Down2 => "D2",
-//         };
-//         string.to_string()
-//     }
-// }
+impl ToString for UserMove {
+    fn to_string(&self) -> String {
+        use self::UserMove::*;
+        let string = match *self {
+            Front => "F",
+            FrontPrime => "F'",
+            Front2 => "F2",
+            Right => "R",
+            RightPrime => "R'",
+            Right2 => "R2",
+            Up => "U",
+            UpPrime => "U'",
+            Up2 => "U2",
+            Back => "B",
+            BackPrime => "B'",
+            Back2 => "B2",
+            Left => "L",
+            LeftPrime => "L'",
+            Left2 => "L2",
+            Down => "D",
+            DownPrime => "D'",
+            Down2 => "D2",
+        };
+        string.to_string()
+    }
+}

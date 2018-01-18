@@ -15,8 +15,8 @@ pub enum Edge {
     DB,
     FR,
     FL,
-    BR,
     BL,
+    BR,
 }
 
 impl Edge {
@@ -33,8 +33,8 @@ impl Edge {
             DB => (Face::D, Face::B),
             FR => (Face::F, Face::R),
             FL => (Face::F, Face::L),
-            BR => (Face::B, Face::R),
             BL => (Face::B, Face::L),
+            BR => (Face::B, Face::R),
         }
     }
 
@@ -73,8 +73,8 @@ impl From<Edge> for usize {
             DB => 7,
             FR => 8,
             FL => 9,
-            BR => 10,
-            BL => 11,
+            BL => 10,
+            BR => 11,
         }
     }
 }
@@ -94,7 +94,7 @@ impl Edges {
         let m = Move_::move_definition(m);
         let mut new_edges = Self::new();
 
-        for edge in usize::from(Edge::UR)..usize::from(Edge::BL) + 1 {
+        for edge in usize::from(Edge::UR)..usize::from(Edge::BR) + 1 {
             let index = usize::from(m.edges_permutation[edge]);
 
             new_edges.permutations[edge] = self.permutations[index];
@@ -119,8 +119,8 @@ impl Default for Edges {
         edges[usize::from(DB)] = DB;
         edges[usize::from(FR)] = FR;
         edges[usize::from(FL)] = FL;
-        edges[usize::from(BR)] = BR;
         edges[usize::from(BL)] = BL;
+        edges[usize::from(BR)] = BR;
 
         Self {
             permutations: edges,
