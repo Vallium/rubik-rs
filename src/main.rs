@@ -1,3 +1,4 @@
+#![feature(inclusive_range_syntax)]
 mod move_;
 mod cube;
 mod coordinate;

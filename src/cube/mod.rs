@@ -6,6 +6,7 @@ use cube::face::Face;
 use cube::corners::Corners;
 use cube::corners::Corner;
 use cube::edges::Edges;
+use cube::edges::Edge;
 use move_::Move;
 use move_::UserMove;
 
@@ -37,7 +38,6 @@ impl Cube {
         Self::default()
     }
 
-
     pub fn is_solved(&self) -> bool {
         *self == Self::default()
     }
@@ -47,15 +47,165 @@ impl Cube {
         self.edges.edges_multiply(m);
     }
 
-    pub fn get_twist(&self) -> u32 {
+    pub fn twist(&self) -> u32 {
         let mut ret: u32 = 0;
 
         for x in usize::from(Corner::URF)..usize::from(Corner::DRB) {
-            ret += 3 * ret + self.corners.orientations[x] as u32;
-            println!("{}", self.corners.orientations[x]);
+            ret = 3 * ret + self.corners.orientations[x] as u32;
          }
-         println!("twist: {}", ret);
          ret
+    }
+
+    pub fn flip(&self) -> u32 {
+        let mut ret: u32 = 0;
+
+        for x in usize::from(Edge::UR)..usize::from(Edge::BR) {
+            ret = 2 * ret + self.edges.orientations[x] as u32;
+        }
+        ret
+    }
+
+    pub fn corner_parity(&self) -> u32 {
+        let mut ret: u32 = 0;
+
+        for x in (usize::from(Corner::URF) + 1..=usize::from(Corner::DRB)).rev() {
+            for y in (usize::from(Corner::URF)..x).rev() {
+                if usize::from(self.corners.permutations[y]) > usize::from(self.corners.permutations[x]) {
+                    ret += 1;
+                }
+            }
+        }
+        ret % 2
+    }
+
+    pub fn fr_to_br(&self) -> u32 {
+        let mut a: u32 = 0;
+        let mut x: u32 = 0;
+        let mut edges: [Edge; 4] = [Edge::UR; 4];
+
+        for i in (usize::from(Edge::UR)..=usize::from(Edge::BR)).rev() {
+            if usize::from(Edge::FR) <= usize::from(self.edges.permutations[i]) && usize::from(self.edges.permutations[i]) <= usize::from(Edge::BR) {
+                a += cnk(11 - i as i16, (x + 1) as i16) as u32;
+                edges[3 - x as usize] = self.edges.permutations[i];
+                x += 1;
+            }
+        }
+
+        let mut b: u32 = 0;
+        for i in (1..=3).rev() {
+            let mut k: u32 = 0;
+            loop {
+                if usize::from(edges[i]) == i + 8 { break; }
+                Edge::rotate_edges_slice(&mut edges, 0, i, false);
+                k += 1;
+            }
+            b = (i as u32 + 1) * b + k;
+        }
+        24 * a + b
+    }
+
+    pub fn urf_to_dlf(&self) -> u32 {
+        let mut a: u32 = 0;
+        let mut x: u32 = 0;
+        let mut corners: [Corner; 6] = [Corner::DBL; 6];
+
+        for i in usize::from(Corner::URF)..=usize::from(Corner::DRB) {
+            if usize::from(self.corners.permutations[i]) <= usize::from(Corner::DLF) {
+                a += cnk(i as i16, (x + 1) as i16) as u32;
+                corners[x as usize] = self.corners.permutations[i];
+                x += 1;
+            }
+        }
+
+        let mut b: u32 = 0;
+        for i in (1..=5).rev() {
+            let mut k: u32 = 0;
+            loop {
+                if usize::from(corners[i]) == i { break; }
+                Corner::rotate_corners_slice(&mut corners, 0, i, false);
+                k += 1;
+            }
+            b = (i as u32 + 1) * b + k;
+        }
+        720 * a + b
+    }
+
+    pub fn ur_to_ul(&self) -> u32 {
+        let mut a: u32 = 0;
+        let mut x: u32 = 0;
+        let mut edges: [Edge; 3] = [Edge::UR; 3];
+
+        for i in usize::from(Edge::UR)..=usize::from(Edge::BR) {
+            if usize::from(self.edges.permutations[i]) <= usize::from(Edge::UL) {
+                a += cnk(i as i16, (x + 1) as i16) as u32;
+                edges[x as usize] = self.edges.permutations[i];
+                x += 1;
+            }
+        }
+
+        let mut b: u32 = 0;
+        for i in (1..=2).rev() {
+            let mut k: u32 = 0;
+            loop {
+                if usize::from(edges[i]) == i { break; }
+                Edge::rotate_edges_slice(&mut edges, 0, i, false);
+                k += 1;
+            }
+            b = (i as u32 + 1) * b + k;
+        }
+        6 * a + b
+    }
+
+    pub fn ub_to_df(&self) -> u32 {
+        let mut a: u32 = 0;
+        let mut x: u32 = 0;
+        let mut edges: [Edge; 3] = [Edge::UR; 3];
+
+        for i in usize::from(Edge::UR)..=usize::from(Edge::BR) {
+            if usize::from(Edge::UB) <= usize::from(self.edges.permutations[i]) && usize::from(self.edges.permutations[i]) <= usize::from(Edge::DF) {
+                a += cnk(i as i16, (x + 1) as i16) as u32;
+                edges[x as usize] = self.edges.permutations[i];
+                x += 1;
+            }
+        }
+
+        let mut b: u32 = 0;
+        for i in (1..=2).rev() {
+            let mut k: u32 = 0;
+            loop {
+                if usize::from(edges[i]) == usize::from(Edge::UB) + i { break; }
+                Edge::rotate_edges_slice(&mut edges, 0, i, false);
+                k += 1;
+            }
+            b = (i as u32 + 1) * b + k;
+        }
+        6 * a + b
+    }
+
+    pub fn ur_to_df(&self) -> u32 {
+        let mut a: u32 = 0;
+        let mut x: u32 = 0;
+        let mut edges: [Edge; 6] = [Edge::UR; 6];
+
+        for i in usize::from(Edge::UR)..=usize::from(Edge::BR) {
+            if usize::from(self.edges.permutations[i]) <= usize::from(Edge::DF) {
+                a += cnk(i as i16, (x + 1) as i16) as u32;
+                edges[x as usize] = self.edges.permutations[i];
+                x += 1;
+            }
+        }
+
+        let mut b: u32 = 0;
+        for i in (1..=5).rev() {
+            let mut k: u32 = 0;
+            loop {
+                if usize::from(edges[i]) == i { break; }
+                Edge::rotate_edges_slice(&mut edges, 0, i, false);
+                k += 1;
+            }
+            b = (i as u32 + 1) * b + k;
+        }
+        720 * a + b
     }
 
     pub fn apply_move(&mut self, m: Move) {
@@ -163,7 +313,7 @@ impl Default for Cube {
 }
 
 /// Binomial coefficient [n choose k].
-pub fn cnk(n: i8, mut k: i8) -> i8 {
+pub fn cnk(n: i16, mut k: i16) -> i16 {
     if n < k {
         return 0;
     }
@@ -171,9 +321,9 @@ pub fn cnk(n: i8, mut k: i8) -> i8 {
         k = n - k;
     }
 
-    let mut i: i8 = n;
-    let mut j: i8 = 1;
-    let mut s: i8 = 1;
+    let mut i: i16 = n;
+    let mut j: i16 = 1;
+    let mut s: i16 = 1;
 
     while i != n - k {
         s *= i;

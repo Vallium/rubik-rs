@@ -56,6 +56,25 @@ impl Edge {
             _ => oriented_b,
         }
     }
+
+    /// Clockwise = false => rotate left
+    pub fn rotate_edges_slice(slice: &mut[Edge], begin: usize, end: usize, clockwise: bool) {
+        let tmp: Edge;
+
+        if !clockwise {
+            tmp = slice[begin];
+            for x in begin..end {
+                slice[x] = slice[x + 1];
+            }
+            slice[end] = tmp;
+        } else {
+            tmp = slice[end];
+            for x in (begin..end).rev() {
+                slice[x] = slice[x - 1];
+            }
+            slice[begin] = tmp;
+        }
+    }
 }
 
 impl From<Edge> for usize {

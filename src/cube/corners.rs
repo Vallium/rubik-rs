@@ -50,6 +50,25 @@ impl Corner {
             _ => oriented_c,
         }
     }
+
+    /// Clockwise = false => rotate left
+    pub fn rotate_corners_slice(slice: &mut[Corner], begin: usize, end: usize, clockwise: bool) {
+        let tmp: Corner;
+
+        if !clockwise {
+             tmp = slice[begin];
+             for x in begin..end {
+                slice[x] = slice[x + 1];
+            }
+            slice[end] = tmp;
+        } else {
+            tmp = slice[end];
+            for x in (begin..end).rev() {
+                slice[x] = slice[x - 1];
+            }
+            slice[begin] = tmp;
+        }
+    }
 }
 
 impl ToString for Corner {
