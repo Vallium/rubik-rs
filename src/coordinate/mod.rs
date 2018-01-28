@@ -11,6 +11,7 @@ const NB_MOVES: usize = 18;
 const NB_TWIST: usize = 2187;
 const NB_FLIP: usize = 2048;
 const NB_FR_TO_BR: usize = 11880;
+const NB_URF_TO_DLF: usize = 20160;
 
 pub struct Coordinate {
     cache_folder_name: String,
@@ -25,6 +26,7 @@ pub struct Coordinate {
     twist_move: [[u32; NB_MOVES]; NB_TWIST],
     flip_move: [[u32; NB_MOVES]; NB_FLIP],
     fr_to_br_move: [[u32; NB_MOVES]; NB_FR_TO_BR],
+    urf_to_dlf_move: [[u32; NB_MOVES]; NB_URF_TO_DLF],
 }
 
 impl Coordinate {
@@ -42,6 +44,7 @@ impl Coordinate {
             twist_move: [[0; NB_MOVES]; NB_TWIST],
             flip_move: [[0; NB_MOVES]; NB_FLIP],
             fr_to_br_move: [[0; NB_MOVES]; NB_FR_TO_BR],
+            urf_to_dlf_move: [[0; NB_MOVES]; NB_URF_TO_DLF],
         }
     }
 
@@ -73,6 +76,7 @@ impl Coordinate {
         self.init_twist_move();
         self.init_flip_move();
         self.init_fr_to_br();
+        self.init_urf_to_dlf();
     }
 
     fn init_twist_move(&mut self) {
@@ -121,5 +125,21 @@ impl Coordinate {
             }
         }
         self.dump_to_file(&self.fr_to_br_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "fr_to_br_move");
+    }
+
+    fn init_urf_to_dlf(&mut self) {
+        let mut solved = Cube::new_default();
+
+        for x in 0..NB_URF_TO_DLF {
+            solved.set_urf_to_dlf(x as i16);
+            for y in 0..6 {
+                for z in 0..3 {
+                    solved.corners_multiply(Move::from_u(y));
+                    self.urf_to_dlf_move[x][3 * y + z] = solved.urf_to_dlf();
+                }
+                solved.corners_multiply(Move::from_u(y));
+            }
+        }
+        self.dump_to_file(&self.urf_to_dlf_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "urf_to_dlf_move");
     }
 }

@@ -137,7 +137,7 @@ impl Cube {
     }
 
     pub fn set_fr_to_br(&mut self, index: i16) {
-        let mut a: i16 = index / 24;
+        let mut a = index / 24;
         let mut b = index % 24;
         let mut edges: [Edge; 4] = [Edge::FR, Edge::FL, Edge::BL, Edge::BR];
         let others: [Edge; 8] = [Edge::UR, Edge::UF, Edge::UL, Edge::UB, Edge::DR, Edge::DF, Edge::DL, Edge::DB];
@@ -195,6 +195,40 @@ impl Cube {
             b = (i as u32 + 1) * b + k;
         }
         720 * a + b
+    }
+
+    pub fn set_urf_to_dlf(&mut self, index: i16) {
+        let mut a = index / 720;
+        let mut b = index % 720;
+        let mut corners: [Corner; 6] = [Corner::URF, Corner::UFL, Corner::ULB, Corner::UBR, Corner::DFR, Corner::DLF];
+        let others: [Corner; 2] = [Corner::DBL, Corner::DRB];
+
+        self.corners.permutations = [Corner::DRB; 8];
+        for x in 1..6 {
+            let mut k = b % (x + 1);
+            b /= x + 1;
+            loop {
+                if k == 0 { break; }
+                Corner::rotate_corners_slice(&mut corners, 0, x as usize, true);
+                k -= 1;
+            }
+        }
+
+        let mut z: i16 = 5;
+        for x in (usize::from(Corner::URF)..=usize::from(Corner::DRB)).rev() {
+            if a - cnk(x as i16, z + 1) >= 0 {
+                self.corners.permutations[x] = corners[z as usize];
+                a -= cnk(x as i16, z + 1);
+                z -= 1;
+            }
+        }
+        z = 0;
+        for x in usize::from(Corner::URF)..=usize::from(Corner::DRB) {
+            if self.corners.permutations[x] == Corner::DRB {
+                self.corners.permutations[x] = others[z as usize];
+                z += 1;
+            }
+        }
     }
 
     pub fn ur_to_ul(&self) -> u32 {
