@@ -136,6 +136,41 @@ impl Cube {
         24 * a + b
     }
 
+    pub fn set_fr_to_br(&mut self, index: i16) {
+        let mut a: i16 = index / 24;
+        let mut b = index % 24;
+        let mut edges: [Edge; 4] = [Edge::FR, Edge::FL, Edge::BL, Edge::BR];
+        let others: [Edge; 8] = [Edge::UR, Edge::UF, Edge::UL, Edge::UB, Edge::DR, Edge::DF, Edge::DL, Edge::DB];
+
+        self.edges.permutations = [Edge::DB; 12];
+        for x in 1..=3 {
+            let mut k = b % (x + 1);
+            b /= x + 1;
+            loop {
+                if k == 0 { break; }
+                Edge::rotate_edges_slice(&mut edges, 0, x as usize, true);
+                k -= 1;
+            }
+        }
+
+        let mut z: i16 = 3;
+        for x in usize::from(Edge::UR)..=usize::from(Edge::BR) {
+            if a - cnk(11 - x as i16, z + 1) >= 0 {
+                self.edges.permutations[x] = edges[3 - z as usize];
+                a -= cnk(11 - x as i16, z + 1);
+                z -= 1;
+            }
+        }
+
+        z = 0;
+        for x in usize::from(Edge::UR)..=usize::from(Edge::BR) {
+            if self.edges.permutations[x] == Edge::DB {
+                self.edges.permutations[x] = others[z as usize];
+                z += 1;
+            }
+        }
+    }
+
     pub fn urf_to_dlf(&self) -> u32 {
         let mut a: u32 = 0;
         let mut x: u32 = 0;

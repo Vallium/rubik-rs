@@ -69,7 +69,7 @@ impl Edge {
             slice[end] = tmp;
         } else {
             tmp = slice[end];
-            for x in (begin..end).rev() {
+            for x in (begin + 1..=end).rev() {
                 slice[x] = slice[x - 1];
             }
             slice[begin] = tmp;
