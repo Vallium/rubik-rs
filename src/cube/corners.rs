@@ -116,7 +116,7 @@ impl Corners {
         Corners::default()
     }
 
-    pub fn corners_multiply(&mut self, m: Move) {
+    pub fn multiply(&mut self, m: Move) {
         let m = Move_::move_definition(m);
         let mut new_corners = Self::new();
 

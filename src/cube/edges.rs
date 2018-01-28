@@ -109,7 +109,7 @@ impl Edges {
         Edges::default()
     }
 
-    pub fn edges_multiply(&mut self, m: Move) {
+    pub fn multiply(&mut self, m: Move) {
         let m = Move_::move_definition(m);
         let mut new_edges = Self::new();
 

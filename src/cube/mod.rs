@@ -42,9 +42,17 @@ impl Cube {
         *self == Self::default()
     }
 
+    pub fn corners_multiply(&mut self, m: Move) {
+        self.corners.multiply(m);
+    }
+
+    pub fn edges_multiply(&mut self, m: Move) {
+        self.edges.multiply(m);
+    }
+
     pub fn multiply(&mut self, m: Move) {
-        self.corners.corners_multiply(m);
-        self.edges.edges_multiply(m);
+        self.corners.multiply(m);
+        self.edges.multiply(m);
     }
 
     pub fn twist(&self) -> u32 {
