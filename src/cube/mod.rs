@@ -56,6 +56,18 @@ impl Cube {
          ret
     }
 
+    pub fn set_twist(&mut self, twist: u32) {
+        let mut twist = twist;
+        let mut parity: u32 = 0;
+
+        for x in (usize::from(Corner::URF)..usize::from(Corner::DRB)).rev() {
+            self.corners.orientations[x] = (twist % 3) as u8;
+            parity += self.corners.orientations[x] as u32;
+            twist /= 3;
+        }
+        self.corners.orientations[usize::from(Corner::DRB)] = (3 - parity as u8 % 3) % 3;
+    }
+
     pub fn flip(&self) -> u32 {
         let mut ret: u32 = 0;
 
