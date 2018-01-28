@@ -85,6 +85,18 @@ impl Cube {
         ret
     }
 
+    pub fn set_flip(&mut self, flip: u32) {
+        let mut flip = flip;
+        let mut parity: u32 = 0;
+
+        for x in (usize::from(Edge::UR)..usize::from(Edge::BR)).rev() {
+            self.edges.orientations[x] = (flip % 2) as u8;
+            parity += self.edges.orientations[x] as u32;
+            flip /= 2;
+        }
+        self.edges.orientations[usize::from(Edge::BR)] = (2 - parity as u8 % 2) % 2;
+    }
+
     pub fn corner_parity(&self) -> u32 {
         let mut ret: u32 = 0;
 
