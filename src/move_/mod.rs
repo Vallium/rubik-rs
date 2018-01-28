@@ -11,6 +11,20 @@ pub enum Move {
     Back,
 }
 
+impl Move {
+    pub fn from_u(u :usize) -> Move {
+        match u {
+            0 => Move::Up,
+            1 => Move::Right,
+            2 => Move::Front,
+            3 => Move::Down,
+            4 => Move::Left,
+            5 => Move::Back,
+            _ => unimplemented!(),
+        }
+    }
+}
+
 pub struct Move_ {
     pub corners_permutation: [Corner; 8],
     pub corners_orientation: [u8; 8],
