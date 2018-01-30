@@ -83,10 +83,18 @@ impl Coordinate {
 
     pub fn init_pruning(&mut self) {
         self.create_cache_dir();
+
         self.init_twist_move();
+        self.dump_to_file(&self.twist_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "twist_move");
+
         self.init_flip_move();
-        self.init_fr_to_br();
-        self.init_urf_to_dlf();
+        self.dump_to_file(&self.flip_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "flip_move");
+
+        self.init_fr_to_br_move();
+        self.dump_to_file(&self.fr_to_br_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "fr_to_br_move");
+
+        self.init_urf_to_dlf_move();
+        self.dump_to_file(&self.urf_to_dlf_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "urf_to_dlf_move");
     }
 
     fn init_twist_move(&mut self) {
@@ -102,7 +110,6 @@ impl Coordinate {
                 solved.corners_multiply(Move::from_u(y));
             }
         }
-        self.dump_to_file(&self.twist_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "twist_move");
     }
 
     fn init_flip_move(&mut self) {
@@ -118,10 +125,9 @@ impl Coordinate {
                 solved.edges_multiply(Move::from_u(y));
             }
         }
-        self.dump_to_file(&self.flip_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "flip_move");
     }
 
-    fn init_fr_to_br(&mut self) {
+    fn init_fr_to_br_move(&mut self) {
         let mut solved = Cube::new_default();
 
         for x in 0..NB_FR_TO_BR {
@@ -134,10 +140,9 @@ impl Coordinate {
                 solved.edges_multiply(Move::from_u(y));
             }
         }
-        self.dump_to_file(&self.fr_to_br_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "fr_to_br_move");
     }
 
-    fn init_urf_to_dlf(&mut self) {
+    fn init_urf_to_dlf_move(&mut self) {
         let mut solved = Cube::new_default();
 
         for x in 0..NB_URF_TO_DLF {
@@ -150,6 +155,43 @@ impl Coordinate {
                 solved.corners_multiply(Move::from_u(y));
             }
         }
-        self.dump_to_file(&self.urf_to_dlf_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "urf_to_dlf_move");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test::Bencher;
+
+    #[bench]
+    fn bench_init_twist_move(b: &mut Bencher) {
+        let cube = Cube::new_default();
+        let mut c = Coordinate::from_cube(&cube);
+
+        b.iter(|| c.init_twist_move());
+    }
+
+    #[bench]
+    fn bench_init_flip_move(b: &mut Bencher) {
+        let cube = Cube::new_default();
+        let mut c = Coordinate::from_cube(&cube);
+
+        b.iter(|| c.init_flip_move());
+    }
+
+    #[bench]
+    fn bench_init_fr_to_br_move(b: &mut Bencher) {
+        let cube = Cube::new_default();
+        let mut c = Coordinate::from_cube(&cube);
+
+        b.iter(|| c.init_fr_to_br_move());
+    }
+
+    #[bench]
+    fn bench_init_urf_to_dlf_move(b: &mut Bencher) {
+        let cube = Cube::new_default();
+        let mut c = Coordinate::from_cube(&cube);
+
+        b.iter(|| c.init_urf_to_dlf_move());
     }
 }

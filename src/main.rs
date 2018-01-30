@@ -1,4 +1,7 @@
 #![feature(inclusive_range_syntax)]
+#![feature(test)]
+
+extern crate test;
 extern crate bincode;
 
 mod move_;
