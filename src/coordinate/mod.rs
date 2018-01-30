@@ -60,14 +60,21 @@ impl Coordinate {
         path.push_str("/");
         path.push_str(name);
 
-        let file = File::create(path);
-        // let decoded: Option<String> = bincode::deserialize(&encoded[..]).unwrap();
+        let file = File::create(&path);
         match file {
-            Ok(mut buf) => {
+            Ok(mut file) => {
                 let encoded: Vec<u8> = bincode::serialize(&arr, bincode::Infinite).unwrap();
-                match buf.write(&encoded[..]) {
-                    Ok(_) => {},
+                match file.write(&encoded[..]) {
+                    Ok(_) => { },
                     Err (e) => println!("{:?}", e),
+                }
+                match file.metadata() {
+                    Ok(metadata) => {
+                        let mut perm = metadata.permissions();
+                        perm.set_readonly(true);]
+                        fs::set_permissions(&path, perm).unwrap();
+                    },
+                    Err(e) => println!("{:?}", e),
                 }
             },
             Err(e) => println!("{:?}", e),
