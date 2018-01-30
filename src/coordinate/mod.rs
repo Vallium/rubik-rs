@@ -48,12 +48,14 @@ impl Coordinate {
         }
     }
 
-    fn dump_to_file(&self, arr: &[&[u32]], name: &str) {
+    fn create_cache_dir(&self) {
         match fs::create_dir(&self.cache_folder_name) {
-            Ok(_) => { },
+            Ok(_) => println!("cache \"folder pruning_tables\" created"),
             Err(e) => println!("{:?}", e),
         }
+    }
 
+    fn dump_to_file(&self, arr: &[&[u32]], name: &str) {
         let mut path = self.cache_folder_name.to_owned();
         path.push_str("/");
         path.push_str(name);
@@ -73,6 +75,7 @@ impl Coordinate {
     }
 
     pub fn init_pruning(&mut self) {
+        self.create_cache_dir();
         self.init_twist_move();
         self.init_flip_move();
         self.init_fr_to_br();
