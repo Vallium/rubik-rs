@@ -71,7 +71,7 @@ impl Coordinate {
                 match file.metadata() {
                     Ok(metadata) => {
                         let mut perm = metadata.permissions();
-                        perm.set_readonly(true);]
+                        perm.set_readonly(true);
                         fs::set_permissions(&path, perm).unwrap();
                     },
                     Err(e) => println!("{:?}", e),
