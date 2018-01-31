@@ -14,6 +14,7 @@ const NB_FR_TO_BR: usize = 11880;
 const NB_URF_TO_DLF: usize = 20160;
 const NB_UR_TO_UL: usize = 1320;
 const NB_UB_TO_DF: usize = 1320;
+const NB_UR_TO_DF: usize = 20160;
 
 pub struct Coordinate {
     cache_folder_name: String,
@@ -31,6 +32,7 @@ pub struct Coordinate {
     urf_to_dlf_move: [[u32; NB_MOVES]; NB_URF_TO_DLF],
     ur_to_ul_move: [[u32; NB_MOVES]; NB_UR_TO_UL],
     ub_to_df_move: [[u32; NB_MOVES]; NB_UB_TO_DF],
+    ur_to_df_move: [[u32; NB_MOVES]; NB_UR_TO_DF],
 }
 
 impl Coordinate {
@@ -51,6 +53,7 @@ impl Coordinate {
             urf_to_dlf_move: [[0; NB_MOVES]; NB_URF_TO_DLF],
             ur_to_ul_move: [[0; NB_MOVES]; NB_UR_TO_UL],
             ub_to_df_move: [[0; NB_MOVES]; NB_UB_TO_DF],
+            ur_to_df_move: [[0; NB_MOVES]; NB_UR_TO_DF],
         }
     }
 
@@ -193,6 +196,21 @@ impl Coordinate {
                 for z in 0..3 {
                     solved.edges_multiply(Move::from_u(y));
                     self.ub_to_df_move[x][3 * y + z] = solved.ub_to_df();
+                }
+                solved.edges_multiply(Move::from_u(y));
+            }
+        }
+    }
+
+    fn init_ur_to_df_move(&mut self) {
+        let mut solved = Cube::new_default();
+
+        for x in 0..NB_UR_TO_UL {
+            solved.set_ur_to_df(x as i16);
+            for y in 0..6 {
+                for z in 0..3 {
+                    solved.edges_multiply(Move::from_u(y));
+                    self.ub_to_df_move[x][3 * y + z] = solved.ur_to_df();
                 }
                 solved.edges_multiply(Move::from_u(y));
             }
