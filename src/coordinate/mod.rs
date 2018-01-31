@@ -12,6 +12,7 @@ const NB_TWIST: usize = 2187;
 const NB_FLIP: usize = 2048;
 const NB_FR_TO_BR: usize = 11880;
 const NB_URF_TO_DLF: usize = 20160;
+const NB_UR_TO_UL: usize = 1320;
 
 pub struct Coordinate {
     cache_folder_name: String,
@@ -27,6 +28,7 @@ pub struct Coordinate {
     flip_move: [[u32; NB_MOVES]; NB_FLIP],
     fr_to_br_move: [[u32; NB_MOVES]; NB_FR_TO_BR],
     urf_to_dlf_move: [[u32; NB_MOVES]; NB_URF_TO_DLF],
+    ur_to_ul_move: [[u32; NB_MOVES]; NB_UR_TO_UL],
 }
 
 impl Coordinate {
@@ -45,6 +47,7 @@ impl Coordinate {
             flip_move: [[0; NB_MOVES]; NB_FLIP],
             fr_to_br_move: [[0; NB_MOVES]; NB_FR_TO_BR],
             urf_to_dlf_move: [[0; NB_MOVES]; NB_URF_TO_DLF],
+            ur_to_ul_move: [[0; NB_MOVES]; NB_UR_TO_UL],
         }
     }
 
@@ -95,13 +98,16 @@ impl Coordinate {
 
         self.init_urf_to_dlf_move();
         self.dump_to_file(&self.urf_to_dlf_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "urf_to_dlf_move");
+
+        self.init_ur_to_ul_move();
+        self.dump_to_file(&self.ur_to_ul_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "ur_to_ul_move");
     }
 
     fn init_twist_move(&mut self) {
         let mut solved = Cube::new_default();
 
         for x in 0..NB_TWIST {
-            solved.set_twist(x as u32);
+            solved.set_twist(x as i16);
             for y in 0..6 {
                 for z in 0..3 {
                     solved.corners_multiply(Move::from_u(y));
@@ -116,7 +122,7 @@ impl Coordinate {
         let mut solved = Cube::new_default();
 
         for x in 0..NB_FLIP {
-            solved.set_flip(x as u32);
+            solved.set_flip(x as i16);
             for y in 0..6 {
                 for z in 0..3 {
                     solved.edges_multiply(Move::from_u(y));
@@ -153,6 +159,21 @@ impl Coordinate {
                     self.urf_to_dlf_move[x][3 * y + z] = solved.urf_to_dlf();
                 }
                 solved.corners_multiply(Move::from_u(y));
+            }
+        }
+    }
+
+    fn init_ur_to_ul_move(&mut self) {
+        let mut solved = Cube::new_default();
+
+        for x in 0..NB_UR_TO_UL {
+            solved.set_ur_to_ul(x as i16);
+            for y in 0..6 {
+                for z in 0..3 {
+                    solved.edges_multiply(Move::from_u(y));
+                    self.ur_to_ul_move[x][3 * y + z] = solved.ur_to_ul();
+                }
+                solved.edges_multiply(Move::from_u(y));
             }
         }
     }
@@ -193,5 +214,13 @@ mod tests {
         let mut c = Coordinate::from_cube(&cube);
 
         b.iter(|| c.init_urf_to_dlf_move());
+    }
+
+    #[bench]
+    fn bench_init_ur_to_ul_move(b: &mut Bencher) {
+        let cube = Cube::new_default();
+        let mut c = Coordinate::from_cube(&cube);
+
+        b.iter(|| c.init_ur_to_ul_move());
     }
 }

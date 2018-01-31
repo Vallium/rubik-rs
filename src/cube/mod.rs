@@ -64,7 +64,7 @@ impl Cube {
          ret
     }
 
-    pub fn set_twist(&mut self, twist: u32) {
+    pub fn set_twist(&mut self, twist: i16) {
         let mut twist = twist;
         let mut parity: u32 = 0;
 
@@ -85,7 +85,7 @@ impl Cube {
         ret
     }
 
-    pub fn set_flip(&mut self, flip: u32) {
+    pub fn set_flip(&mut self, flip: i16) {
         let mut flip = flip;
         let mut parity: u32 = 0;
 
@@ -257,14 +257,40 @@ impl Cube {
         6 * a + b
     }
 
+    pub fn set_ur_to_ul(&mut self, index: i16) {
+        let mut a = index / 6;
+        let mut b = index % 6;
+        let mut edges: [Edge; 3] = [Edge::UR, Edge::UF, Edge::UL];
+
+        self.edges.permutations = [Edge::BR; 12];
+        for x in 1..=2 {
+            let mut k: i16 = b % (x + 1);
+            b /= x + 1;
+            loop {
+                if k == 0 { break; }
+                Edge::rotate_edges_slice(&mut edges, 0, x as usize, true);
+                k -= 1;
+            }
+        }
+
+        let mut z: i16 = 2;
+        for x in (usize::from(Edge::UR)..=usize::from(Edge::BR)).rev() {
+            if a - cnk(x as i16, z + 1) >= 0 {
+                self.edges.permutations[x] = edges[z as usize];
+                a -= cnk(x as i16, z + 1);
+                z -=1;
+            }
+        }
+    }
+
     pub fn ub_to_df(&self) -> u32 {
         let mut a: u32 = 0;
-        let mut x: u32 = 0;
+        let mut x: i16 = 0;
         let mut edges: [Edge; 3] = [Edge::UR; 3];
 
         for i in usize::from(Edge::UR)..=usize::from(Edge::BR) {
             if usize::from(Edge::UB) <= usize::from(self.edges.permutations[i]) && usize::from(self.edges.permutations[i]) <= usize::from(Edge::DF) {
-                a += cnk(i as i16, (x + 1) as i16) as u32;
+                a += cnk(i as i16, x + 1) as u32;
                 edges[x as usize] = self.edges.permutations[i];
                 x += 1;
             }
@@ -285,12 +311,12 @@ impl Cube {
 
     pub fn ur_to_df(&self) -> u32 {
         let mut a: u32 = 0;
-        let mut x: u32 = 0;
+        let mut x: i16 = 0;
         let mut edges: [Edge; 6] = [Edge::UR; 6];
 
         for i in usize::from(Edge::UR)..=usize::from(Edge::BR) {
             if usize::from(self.edges.permutations[i]) <= usize::from(Edge::DF) {
-                a += cnk(i as i16, (x + 1) as i16) as u32;
+                a += cnk(i as i16, x + 1) as u32;
                 edges[x as usize] = self.edges.permutations[i];
                 x += 1;
             }
