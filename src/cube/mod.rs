@@ -309,6 +309,32 @@ impl Cube {
         6 * a + b
     }
 
+    pub fn set_ub_to_df(&mut self, index: i16) {
+        let mut a = index / 6;
+        let mut b = index % 6;
+        let mut edges: [Edge; 3] = [Edge::UB, Edge::DR, Edge::DF];
+
+        self.edges.permutations = [Edge::BR; 12];
+        for x in 1..=2 {
+            let mut k: i16 = b % (x + 1);
+            b /= x + 1;
+            loop {
+                if k == 0 { break; }
+                Edge::rotate_edges_slice(&mut edges, 0, x as usize, true);
+                k -= 1;
+            }
+        }
+
+        let mut z: i16 = 2;
+        for x in (usize::from(Edge::UR)..=usize::from(Edge::BR)).rev() {
+            if a - cnk(x as i16, z + 1) >= 0 {
+                self.edges.permutations[x] = edges[z as usize];
+                a -= cnk(x as i16, z + 1);
+                z -=1;
+            }
+        }
+    }
+
     pub fn ur_to_df(&self) -> u32 {
         let mut a: u32 = 0;
         let mut x: i16 = 0;

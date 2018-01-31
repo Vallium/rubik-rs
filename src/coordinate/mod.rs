@@ -13,6 +13,7 @@ const NB_FLIP: usize = 2048;
 const NB_FR_TO_BR: usize = 11880;
 const NB_URF_TO_DLF: usize = 20160;
 const NB_UR_TO_UL: usize = 1320;
+const NB_UB_TO_DF: usize = 1320;
 
 pub struct Coordinate {
     cache_folder_name: String,
@@ -29,6 +30,7 @@ pub struct Coordinate {
     fr_to_br_move: [[u32; NB_MOVES]; NB_FR_TO_BR],
     urf_to_dlf_move: [[u32; NB_MOVES]; NB_URF_TO_DLF],
     ur_to_ul_move: [[u32; NB_MOVES]; NB_UR_TO_UL],
+    ub_to_df_move: [[u32; NB_MOVES]; NB_UB_TO_DF],
 }
 
 impl Coordinate {
@@ -48,6 +50,7 @@ impl Coordinate {
             fr_to_br_move: [[0; NB_MOVES]; NB_FR_TO_BR],
             urf_to_dlf_move: [[0; NB_MOVES]; NB_URF_TO_DLF],
             ur_to_ul_move: [[0; NB_MOVES]; NB_UR_TO_UL],
+            ub_to_df_move: [[0; NB_MOVES]; NB_UB_TO_DF],
         }
     }
 
@@ -88,19 +91,22 @@ impl Coordinate {
         self.create_cache_dir();
 
         self.init_twist_move();
-        self.dump_to_file(&self.twist_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "twist_move");
+        // self.dump_to_file(&self.twist_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "twist_move");
 
         self.init_flip_move();
-        self.dump_to_file(&self.flip_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "flip_move");
+        // self.dump_to_file(&self.flip_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "flip_move");
 
         self.init_fr_to_br_move();
-        self.dump_to_file(&self.fr_to_br_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "fr_to_br_move");
+        // self.dump_to_file(&self.fr_to_br_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "fr_to_br_move");
 
         self.init_urf_to_dlf_move();
-        self.dump_to_file(&self.urf_to_dlf_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "urf_to_dlf_move");
+        // self.dump_to_file(&self.urf_to_dlf_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "urf_to_dlf_move");
 
         self.init_ur_to_ul_move();
-        self.dump_to_file(&self.ur_to_ul_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "ur_to_ul_move");
+        // self.dump_to_file(&self.ur_to_ul_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "ur_to_ul_move");
+
+        self.init_ub_to_df_move();
+        // self.dump_to_file(&self.ub_to_df_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "ub_to_df_move");
     }
 
     fn init_twist_move(&mut self) {
@@ -177,6 +183,21 @@ impl Coordinate {
             }
         }
     }
+
+    fn init_ub_to_df_move(&mut self) {
+        let mut solved = Cube::new_default();
+
+        for x in 0..NB_UR_TO_UL {
+            solved.set_ub_to_df(x as i16);
+            for y in 0..6 {
+                for z in 0..3 {
+                    solved.edges_multiply(Move::from_u(y));
+                    self.ub_to_df_move[x][3 * y + z] = solved.ub_to_df();
+                }
+                solved.edges_multiply(Move::from_u(y));
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -222,5 +243,13 @@ mod tests {
         let mut c = Coordinate::from_cube(&cube);
 
         b.iter(|| c.init_ur_to_ul_move());
+    }
+
+    #[bench]
+    fn bench_init_ur_to_ul_move(b: &mut Bencher) {
+        let cube = Cube::new_default();
+        let mut c = Coordinate::from_cube(&cube);
+
+        b.iter(|| c.init_ub_to_df_move());
     }
 }
