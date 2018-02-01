@@ -6,6 +6,7 @@ use std::fs::File;
 use std::io::Write;
 
 use bincode;
+use serde;
 
 const NB_MOVES: usize = 18;
 const NB_TWIST: usize = 2187;
@@ -66,7 +67,8 @@ impl Coordinate {
         }
     }
 
-    fn dump_to_file(&self, arr: &[&[u32]], name: &str) {
+    fn dump_to_file<T>(&self, arr: T, name: &str)
+        where T: serde::ser::Serialize {
         let mut path = self.cache_folder_name.to_owned();
         path.push_str("/");
         path.push_str(name);
