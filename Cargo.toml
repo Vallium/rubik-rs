@@ -5,3 +5,4 @@ authors = ["Vallium <anton.alliot@gmail.com>"]
 
 [dependencies]
 bincode = "*"
+serde = "1.0.27"

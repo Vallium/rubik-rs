@@ -3,6 +3,7 @@
 
 extern crate test;
 extern crate bincode;
+extern crate serde;
 
 mod move_;
 mod cube;
