@@ -395,6 +395,24 @@ impl Cube {
         }
     }
 
+    pub fn ur_to_uf_standalone(index1: i16, index2: i16) -> i16 {
+        let mut a: Cube = Cube::new_default();
+        let mut b: Cube = Cube::new_default();
+
+        a.set_ur_to_ul(index1);
+        b.set_ub_to_df(index2);
+        for x in 0..8 {
+            if a.edges.permutations[x] != Edge::BR {
+                if b.edges.permutations[x] != Edge::BR {
+                    return -1
+                } else {
+                    b.edges.permutations[x] = a.edges.permutations[x];
+                }
+            }
+        }
+        b.ur_to_df() as i16
+    }
+
     pub fn apply_move(&mut self, m: Move) {
         use move_::Move::*;
         match m {

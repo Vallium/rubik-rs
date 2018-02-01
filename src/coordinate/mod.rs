@@ -33,6 +33,7 @@ pub struct Coordinate {
     ur_to_ul_move: Box<[[u32; NB_MOVES]; NB_UR_TO_UL]>,
     ub_to_df_move: Box<[[u32; NB_MOVES]; NB_UB_TO_DF]>,
     ur_to_df_move: Box<[[u32; NB_MOVES]; NB_UR_TO_DF]>,
+    merge_ur_to_ul_and_ub_to_df: Box<[[i16; 336]; 336]>
 }
 
 impl Coordinate {
@@ -54,6 +55,7 @@ impl Coordinate {
             ur_to_ul_move: Box::new([[0; NB_MOVES]; NB_UR_TO_UL]),
             ub_to_df_move: Box::new([[0; NB_MOVES]; NB_UB_TO_DF]),
             ur_to_df_move: Box::new([[0; NB_MOVES]; NB_UR_TO_DF]),
+            merge_ur_to_ul_and_ub_to_df: Box::new([[0; 336]; 336]),
         }
     }
 
@@ -113,6 +115,9 @@ impl Coordinate {
 
         self.init_ur_to_df_move();
         // self.dump_to_file(&self.ur_to_df_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "ur_to_df_move");
+
+        self.init_merge_ur_to_ul_and_ub_to_df();
+        // self.dump_to_file(&self.merge_ur_to_ul_and_ub_to_df.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "merge_ur_to_ul_and_ub_to_df");
     }
 
     fn init_twist_move(&mut self) {
@@ -216,6 +221,14 @@ impl Coordinate {
                     self.ur_to_df_move[x][3 * y + z] = solved.ur_to_df();
                 }
                 solved.edges_multiply(Move::from_u(y));
+            }
+        }
+    }
+
+    fn init_merge_ur_to_ul_and_ub_to_df(&mut self) {
+        for ur_to_ul in 0..336 {
+            for ub_to_df in 0..336 {
+                self.merge_ur_to_ul_and_ub_to_df[ur_to_ul][ub_to_df] = Cube::ur_to_uf_standalone(ur_to_ul as i16, ub_to_df as i16);
             }
         }
     }
