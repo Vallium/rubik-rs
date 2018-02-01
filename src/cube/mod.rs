@@ -361,6 +361,40 @@ impl Cube {
         720 * a + b
     }
 
+    pub fn set_ur_to_df(&mut self, index: i16) {
+        let mut a = index / 720;
+        let mut b = index % 720;
+        let mut edges: [Edge; 6] = [Edge::UR, Edge::UF, Edge::UL, Edge::UB, Edge::DR, Edge::DF];
+        let others: [Edge; 6] = [Edge::DL, Edge::DB, Edge::FR, Edge::FL, Edge::BL, Edge::BR];
+
+        self.edges.permutations = [Edge::BR; 12];
+        for x in 1..6 {
+            let mut k = b % (x + 1);
+            b /= x + 1;
+            loop {
+                if k == 0 { break; }
+                Edge::rotate_edges_slice(&mut edges, 0, x as usize, true);
+                k -= 1;
+            }
+        }
+
+        let mut z: i16 = 5;
+        for x in (usize::from(Edge::UR)..=usize::from(Edge::BR)).rev() {
+            if a - cnk(x as i16, z + 1) >= 0 {
+                self.edges.permutations[x] = edges[z as usize];
+                a -= cnk(x as i16, z + 1);
+                z -= 1;
+            }
+        }
+        z = 0;
+        for x in usize::from(Edge::UR)..=usize::from(Edge::BR) {
+            if self.edges.permutations[x] == Edge::BR {
+                self.edges.permutations[x] = others[z as usize];
+                z += 1;
+            }
+        }
+    }
+
     pub fn apply_move(&mut self, m: Move) {
         use move_::Move::*;
         match m {

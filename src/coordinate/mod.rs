@@ -110,6 +110,9 @@ impl Coordinate {
 
         self.init_ub_to_df_move();
         // self.dump_to_file(&self.ub_to_df_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "ub_to_df_move");
+
+        self.init_ur_to_df_move();
+        // self.dump_to_file(&self.ur_to_df_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "ur_to_df_move");
     }
 
     fn init_twist_move(&mut self) {
@@ -205,12 +208,12 @@ impl Coordinate {
     fn init_ur_to_df_move(&mut self) {
         let mut solved = Cube::new_default();
 
-        for x in 0..NB_UR_TO_UL {
+        for x in 0..NB_UR_TO_DF {
             solved.set_ur_to_df(x as i16);
             for y in 0..6 {
                 for z in 0..3 {
                     solved.edges_multiply(Move::from_u(y));
-                    self.ub_to_df_move[x][3 * y + z] = solved.ur_to_df();
+                    self.ur_to_df_move[x][3 * y + z] = solved.ur_to_df();
                 }
                 solved.edges_multiply(Move::from_u(y));
             }
