@@ -26,13 +26,13 @@ pub struct Coordinate {
     ur_to_ul: u32,
     ub_to_df: u32,
     ur_to_df: u32,
-    twist_move: [[u32; NB_MOVES]; NB_TWIST],
-    flip_move: [[u32; NB_MOVES]; NB_FLIP],
-    fr_to_br_move: [[u32; NB_MOVES]; NB_FR_TO_BR],
-    urf_to_dlf_move: [[u32; NB_MOVES]; NB_URF_TO_DLF],
-    ur_to_ul_move: [[u32; NB_MOVES]; NB_UR_TO_UL],
-    ub_to_df_move: [[u32; NB_MOVES]; NB_UB_TO_DF],
-    ur_to_df_move: [[u32; NB_MOVES]; NB_UR_TO_DF],
+    twist_move: Box<[[u32; NB_MOVES]; NB_TWIST]>,
+    flip_move: Box<[[u32; NB_MOVES]; NB_FLIP]>,
+    fr_to_br_move: Box<[[u32; NB_MOVES]; NB_FR_TO_BR]>,
+    urf_to_dlf_move: Box<[[u32; NB_MOVES]; NB_URF_TO_DLF]>,
+    ur_to_ul_move: Box<[[u32; NB_MOVES]; NB_UR_TO_UL]>,
+    ub_to_df_move: Box<[[u32; NB_MOVES]; NB_UB_TO_DF]>,
+    ur_to_df_move: Box<[[u32; NB_MOVES]; NB_UR_TO_DF]>,
 }
 
 impl Coordinate {
@@ -47,13 +47,13 @@ impl Coordinate {
             ur_to_ul: cube.ur_to_ul(),
             ub_to_df: cube.ub_to_df(),
             ur_to_df: cube.ur_to_df(),
-            twist_move: [[0; NB_MOVES]; NB_TWIST],
-            flip_move: [[0; NB_MOVES]; NB_FLIP],
-            fr_to_br_move: [[0; NB_MOVES]; NB_FR_TO_BR],
-            urf_to_dlf_move: [[0; NB_MOVES]; NB_URF_TO_DLF],
-            ur_to_ul_move: [[0; NB_MOVES]; NB_UR_TO_UL],
-            ub_to_df_move: [[0; NB_MOVES]; NB_UB_TO_DF],
-            ur_to_df_move: [[0; NB_MOVES]; NB_UR_TO_DF],
+            twist_move: Box::new([[0; NB_MOVES]; NB_TWIST]),
+            flip_move: Box::new([[0; NB_MOVES]; NB_FLIP]),
+            fr_to_br_move: Box::new([[0; NB_MOVES]; NB_FR_TO_BR]),
+            urf_to_dlf_move: Box::new([[0; NB_MOVES]; NB_URF_TO_DLF]),
+            ur_to_ul_move: Box::new([[0; NB_MOVES]; NB_UR_TO_UL]),
+            ub_to_df_move: Box::new([[0; NB_MOVES]; NB_UB_TO_DF]),
+            ur_to_df_move: Box::new([[0; NB_MOVES]; NB_UR_TO_DF]),
         }
     }
 
