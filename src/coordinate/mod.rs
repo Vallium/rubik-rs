@@ -39,6 +39,7 @@ pub struct Coordinate {
     ur_to_df_move: Box<[[u32; NB_MOVES]; NB_UR_TO_DF]>,
     merge_ur_to_ul_and_ub_to_df: Box<[[i16; 336]; 336]>,
     urf_to_dlf_parity_prun: Box<[i8; NB_SLICE * NB_URF_TO_DLF * NB_PARITY / 2]>,
+    ur_to_df_parity_prun: Box<[i8; NB_SLICE * NB_UR_TO_DF * NB_PARITY / 2]>,
 }
 
 impl Coordinate {
@@ -65,6 +66,7 @@ impl Coordinate {
             ur_to_df_move: Box::new([[0; NB_MOVES]; NB_UR_TO_DF]),
             merge_ur_to_ul_and_ub_to_df: Box::new([[0; 336]; 336]),
             urf_to_dlf_parity_prun: box [0; NB_SLICE * NB_URF_TO_DLF * NB_PARITY / 2],
+            ur_to_df_parity_prun: box [0; NB_SLICE * NB_UR_TO_DF * NB_PARITY / 2],
         }
     }
 
@@ -131,6 +133,9 @@ impl Coordinate {
 
         self.init_urf_to_dlf_parity_prun();
         // self.dump_to_file(&self.urf_to_dlf_parity_prun.iter().map(|x| &x[..]).collect::<Vec<&[i8]>>(), "urf_to_dlf_parity_prun");
+
+        self.init_ur_to_df_parity_prun();
+        // self.dump_to_file(&self.ur_to_df_parity_prun.iter().map(|x| &x[..]).collect::<Vec<&[i8]>>(), "ur_to_df_parity_prun");
     }
 
     fn init_twist_move(&mut self) {
@@ -271,7 +276,6 @@ impl Coordinate {
                                 let index = ((NB_SLICE as i32 * n_urf_to_dlf as i32 + n_slice as i32) * 2 + n_parity as i32) as usize;
                                 if Self::prunning(&self.urf_to_dlf_parity_prun[..], index) == 0x0f {
                                     Self::set_prunning(&mut self.urf_to_dlf_parity_prun[..], index, depth + 1);
-                                    println!("{:x}", Self::prunning(&self.urf_to_dlf_parity_prun[..], index));
                                     done += 1;
                                 }
                             },
@@ -283,7 +287,42 @@ impl Coordinate {
         }
     }
 
+    fn init_ur_to_df_parity_prun(&mut self) {
+        self.ur_to_df_parity_prun = Box::new([-1; NB_SLICE * NB_UR_TO_DF * NB_PARITY / 2]);
+        let mut depth = 0;
+        let mut done = 1;
 
+        Self::set_prunning(&mut self.ur_to_df_parity_prun[..], 0, 0);
+
+        loop {
+            if done == NB_SLICE * NB_UR_TO_DF * NB_PARITY { break; }
+
+            for x in 0..NB_SLICE * NB_UR_TO_DF * NB_PARITY {
+                let parity = x % 2;
+                let ur_to_df = (x / 2) / NB_SLICE;
+                let slice = (x / 2) % NB_SLICE;
+                if Self::prunning(&self.ur_to_df_parity_prun[..], x) == depth {
+                    for y in 0..NB_MOVES {
+                        match y {
+                            3 | 5 | 6 | 8 | 12 | 14 | 15 | 17 => continue,
+                            _ => {
+                                let n_slice = self.fr_to_br_move[slice][y];
+                                let n_ur_to_df = self.ur_to_df_move[ur_to_df][y];
+                                let n_parity = self.parity_move[parity][y];
+                                let index = ((NB_SLICE as i32 * n_ur_to_df as i32 + n_slice as i32) * 2 + n_parity as i32) as usize;
+                                if Self::prunning(&self.ur_to_df_parity_prun[..], index) == 0x0f {
+                                    Self::set_prunning(&mut self.ur_to_df_parity_prun[..], index, depth + 1);
+                                    println!("{:x}", Self::prunning(&self.ur_to_df_parity_prun[..], index));
+                                    done += 1;
+                                }
+                            },
+                        }
+                    }
+                }
+            }
+            depth += 1;
+        }
+    }
 
     fn set_prunning(arr: &mut [i8], i: usize, value: i8) {
         if i & 1 == 0 {
