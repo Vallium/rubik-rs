@@ -1,4 +1,5 @@
 #![feature(inclusive_range_syntax)]
+#![feature(box_syntax)]
 #![feature(test)]
 
 extern crate test;
