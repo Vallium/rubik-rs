@@ -42,6 +42,7 @@ pub struct Coordinate {
     urf_to_dlf_parity_prun: Box<[i8; NB_SLICE * NB_URF_TO_DLF * NB_PARITY / 2]>,
     ur_to_df_parity_prun: Box<[i8; NB_SLICE * NB_UR_TO_DF * NB_PARITY / 2]>,
     twist_prun: Box<[i8; NB_SLICE_TWIST_FLIP * NB_TWIST / 2 + 1]>,
+    flip_prun: Box<[i8; NB_SLICE_TWIST_FLIP * NB_FLIP / 2 + 1]>,
 }
 
 impl Coordinate {
@@ -70,6 +71,7 @@ impl Coordinate {
             urf_to_dlf_parity_prun: box [0; NB_SLICE * NB_URF_TO_DLF * NB_PARITY / 2],
             ur_to_df_parity_prun: box [0; NB_SLICE * NB_UR_TO_DF * NB_PARITY / 2],
             twist_prun: box [0; NB_SLICE_TWIST_FLIP * NB_TWIST / 2 + 1],
+            flip_prun: box [0; NB_SLICE_TWIST_FLIP * NB_FLIP / 2 + 1],
         }
     }
 
@@ -142,6 +144,9 @@ impl Coordinate {
 
         self.init_twist_prun();
         // self.dump_to_file(&self.twist_prun.iter().map(|x| &x[..]).collect::<Vec<&[i8]>>(), "twist_prun");
+
+        self.init_flip_prun();
+        // self.dump_to_file(&self.flip_prun.iter().map(|x| &x[..]).collect::<Vec<&[i8]>>(), "flip_prun");
     }
 
     fn init_twist_move(&mut self) {
@@ -349,7 +354,35 @@ impl Coordinate {
                         let index = (NB_SLICE_TWIST_FLIP as i32 * n_twist as i32 + n_slice as i32) as usize;
                         if Self::prunning(&self.twist_prun[..], index) == 0x0f {
                             Self::set_prunning(&mut self.twist_prun[..], index, depth + 1);
-                            println!("{:x}", Self::prunning(&self.twist_prun[..], index));
+                            done += 1;
+                        }
+                    }
+                }
+            }
+            depth += 1;
+        }
+    }
+
+    fn init_flip_prun(&mut self) {
+        self.flip_prun = box [-1 ; NB_SLICE_TWIST_FLIP * NB_FLIP / 2 + 1];
+        let mut depth = 0;
+        let mut done = 1;
+
+        Self::set_prunning(&mut self.flip_prun[..], 0, 0);
+
+        loop {
+            if done == NB_SLICE_TWIST_FLIP * NB_FLIP { break; }
+
+            for x in 0..NB_SLICE_TWIST_FLIP * NB_FLIP {
+                let flip = x / NB_SLICE_TWIST_FLIP;
+                let slice = x % NB_SLICE_TWIST_FLIP;
+                if Self::prunning(&self.flip_prun[..], x) == depth {
+                    for y in 0..NB_MOVES {
+                        let n_flip = self.flip_move[flip][y];
+                        let n_slice = self.fr_to_br_move[slice * 24][y] / 24;
+                        let index = (NB_SLICE_TWIST_FLIP as i32 * n_flip as i32 + n_slice as i32) as usize;
+                        if Self::prunning(&self.flip_prun[..], index) == 0x0f {
+                            Self::set_prunning(&mut self.flip_prun[..], index, depth + 1);
                             done += 1;
                         }
                     }
