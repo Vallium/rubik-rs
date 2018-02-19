@@ -30,19 +30,19 @@ pub struct Coordinate {
     ur_to_ul: u32,
     ub_to_df: u32,
     ur_to_df: u32,
-    twist_move: Box<[[u32; NB_MOVES]; NB_TWIST]>,
-    flip_move: Box<[[u32; NB_MOVES]; NB_FLIP]>,
-    parity_move: Box<[[i8; NB_MOVES]; 2]>,
-    fr_to_br_move: Box<[[u32; NB_MOVES]; NB_FR_TO_BR]>,
-    urf_to_dlf_move: Box<[[u32; NB_MOVES]; NB_URF_TO_DLF]>,
-    ur_to_ul_move: Box<[[u32; NB_MOVES]; NB_UR_TO_UL]>,
-    ub_to_df_move: Box<[[u32; NB_MOVES]; NB_UB_TO_DF]>,
-    ur_to_df_move: Box<[[u32; NB_MOVES]; NB_UR_TO_DF]>,
-    merge_ur_to_ul_and_ub_to_df: Box<[[i16; 336]; 336]>,
-    urf_to_dlf_parity_prun: Box<[i8; NB_SLICE * NB_URF_TO_DLF * NB_PARITY / 2]>,
-    ur_to_df_parity_prun: Box<[i8; NB_SLICE * NB_UR_TO_DF * NB_PARITY / 2]>,
-    twist_prun: Box<[i8; NB_SLICE_TWIST_FLIP * NB_TWIST / 2 + 1]>,
-    flip_prun: Box<[i8; NB_SLICE_TWIST_FLIP * NB_FLIP / 2 + 1]>,
+    twist_move: Box<[[u32; NB_MOVES]]>,
+    flip_move: Box<[[u32; NB_MOVES]]>,
+    parity_move: Box<[[i8; NB_MOVES]]>,
+    fr_to_br_move: Box<[[u32; NB_MOVES]]>,
+    urf_to_dlf_move: Box<[[u32; NB_MOVES]]>,
+    ur_to_ul_move: Box<[[u32; NB_MOVES]]>,
+    ub_to_df_move: Box<[[u32; NB_MOVES]]>,
+    ur_to_df_move: Box<[[u32; NB_MOVES]]>,
+    merge_ur_to_ul_and_ub_to_df: Box<[[i16; 336]]>,
+    urf_to_dlf_parity_prun: Box<[i8]>,
+    ur_to_df_parity_prun: Box<[i8]>,
+    twist_prun: Box<[i8]>,
+    flip_prun: Box<[i8]>,
 }
 
 impl Coordinate {
@@ -129,47 +129,151 @@ impl Coordinate {
     pub fn init_pruning(&mut self) {
         self.create_cache_dir();
 
-        self.init_twist_move();
-        // self.dump_to_file(&self.twist_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "twist_move");
-        self.dump_to_file(&self.twist_move[..], "twist_move");
+        match self.read_cache_table::<Box<[[u32; NB_MOVES]]>>("twist_move") {
+            Some(a) => {
+                println!("reading twist_move from file");
+                assert_eq!(a.len(), NB_TWIST);
+                self.twist_move = a;
+            },
+            None => {
+                self.init_twist_move();
+                println!("dumping twist_move in cache file");
+                self.dump_to_file(&self.twist_move[..], "twist_move");
+            },
+        }
 
-        self.init_flip_move();
-        // self.dump_to_file(&self.flip_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "flip_move");
+        match self.read_cache_table::<Box<[[u32; NB_MOVES]]>>("flip_move") {
+            Some(a) => {
+                println!("reading flip_move from file");
+                assert_eq!(a.len(), NB_FLIP);
+                self.flip_move = a;
+            },
+            None => {
+                self.init_flip_move();
+                println!("dumping flip_move in cache file");
+                self.dump_to_file(&self.flip_move[..], "flip_move");
+            },
+        }
 
-        self.init_fr_to_br_move();
-        // self.dump_to_file(&self.fr_to_br_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "fr_to_br_move");
+        match self.read_cache_table::<Box<[[u32; NB_MOVES]]>>("fr_to_br_move") {
+            Some(a) => {
+                println!("reading fr_to_br_move from file");
+                assert_eq!(a.len(), NB_FR_TO_BR);
+                self.fr_to_br_move = a;
+            },
+            None => {
+                self.init_fr_to_br_move();
+                println!("dumping fr_to_br_move in cache file");
+                self.dump_to_file(&self.fr_to_br_move[..], "fr_to_br_move");
+            },
+        }
 
-        self.init_urf_to_dlf_move();
-        // self.dump_to_file(&self.urf_to_dlf_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "urf_to_dlf_move");
+        match self.read_cache_table::<Box<[[u32; NB_MOVES]]>>("urf_to_dlf_move") {
+            Some(a) => {
+                println!("reading urf_to_dlf_move from file");
+                assert_eq!(a.len(), NB_URF_TO_DLF);
+                self.urf_to_dlf_move = a;
+            },
+            None => {
+                self.init_urf_to_dlf_move();
+                println!("dumping urf_to_dlf_move in cache file");
+                self.dump_to_file(&self.urf_to_dlf_move[..], "urf_to_dlf_move");
+            },
+        }
 
-        self.init_ur_to_ul_move();
-        // self.dump_to_file(&self.ur_to_ul_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "ur_to_ul_move");
+        match self.read_cache_table::<Box<[[u32; NB_MOVES]]>>("ur_to_ul_move") {
+            Some(a) => {
+                println!("reading ur_to_ul_move from file");
+                assert_eq!(a.len(), NB_UR_TO_UL);
+                self.ur_to_ul_move = a;
+            },
+            None => {
+                self.init_ur_to_ul_move();
+                println!("dumping ur_to_ul_move in cache file");
+                self.dump_to_file(&self.ur_to_ul_move[..], "ur_to_ul_move");
+            },
+        }
 
-        self.init_ub_to_df_move();
-        // self.dump_to_file(&self.ub_to_df_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "ub_to_df_move");
+        match self.read_cache_table::<Box<[[u32; NB_MOVES]]>>("ub_to_df_move") {
+            Some(a) => {
+                println!("reading ub_to_df_move from file");
+                assert_eq!(a.len(), NB_UB_TO_DF);
+                self.ub_to_df_move = a;
+            },
+            None => {
+                self.init_ub_to_df_move();
+                println!("dumping ub_to_df_move in cache file");
+                self.dump_to_file(&self.ub_to_df_move[..], "ub_to_df_move");
+            },
+        }
 
-        self.init_ur_to_df_move();
-        // self.dump_to_file(&self.ur_to_df_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "ur_to_df_move");
+        match self.read_cache_table::<Box<[[u32; NB_MOVES]]>>("ur_to_df_move") {
+            Some(a) => {
+                println!("reading ur_to_df_move from file");
+                assert_eq!(a.len(), NB_UR_TO_DF);
+                self.ur_to_df_move = a;
+            },
+            None => {
+                self.init_ur_to_df_move();
+                println!("dumping ur_to_df_move in cache file");
+                self.dump_to_file(&self.ur_to_df_move[..], "ur_to_df_move");
+            },
+        }
 
         self.init_merge_ur_to_ul_and_ub_to_df();
         // self.dump_to_file(&self.merge_ur_to_ul_and_ub_to_df.iter().map(|x| &x[..]).collect::<Vec<&[i16]>>(), "merge_ur_to_ul_and_ub_to_df");
 
-        self.init_urf_to_dlf_parity_prun();
-        self.dump_to_file(&self.urf_to_dlf_parity_prun[..], "urf_to_dlf_parity_prun");
+        match self.read_cache_table::<Box<[i8]>>("urf_to_dlf_parity_prun") {
+            Some(a) => {
+                println!("reading urf_to_dlf_parity_prun from file");
+                assert_eq!(a.len(), NB_SLICE * NB_URF_TO_DLF * NB_PARITY / 2);
+                self.urf_to_dlf_parity_prun = a;
+            },
+            None => {
+                self.init_urf_to_dlf_parity_prun();
+                println!("dumping urf_to_dlf_parity_prun in cache file");
+                self.dump_to_file(&self.urf_to_dlf_parity_prun[..], "urf_to_dlf_parity_prun");
+            },
+        }
 
-        self.init_ur_to_df_parity_prun();
-        self.dump_to_file(&self.ur_to_df_parity_prun[..], "ur_to_df_parity_prun");
+        match self.read_cache_table::<Box<[i8]>>("ur_to_df_parity_prun") {
+            Some(a) => {
+                println!("reading ur_to_df_parity_prun from file");
+                assert_eq!(a.len(), NB_SLICE * NB_UR_TO_DF * NB_PARITY / 2);
+                self.ur_to_df_parity_prun = a;
+            },
+            None => {
+                self.init_ur_to_df_parity_prun();
+                println!("dumping ur_to_df_parity_prun in cache file");
+                self.dump_to_file(&self.ur_to_df_parity_prun[..], "ur_to_df_parity_prun");
+            },
+        }
 
-        self.init_twist_prun();
-        self.dump_to_file(&self.twist_prun[..], "twist_prun");
         match self.read_cache_table::<Box<[i8]>>("twist_prun") {
             Some(a) => {
-                // assert_eq!(a[..], self.twist_move[..]);
+                println!("reading twist_prun from file");
+                assert_eq!(a.len(), NB_SLICE_TWIST_FLIP * NB_TWIST / 2 + 1);
+                self.twist_prun = a;
             },
-            None => unimplemented!(),
+            None => {
+                self.init_twist_prun();
+                println!("dumping twist_prun in cache file");
+                self.dump_to_file(&self.twist_prun[..], "twist_prun");
+            },
         }
-        self.init_flip_prun();
-        self.dump_to_file(&self.flip_prun[..], "flip_prun");
+
+        match self.read_cache_table::<Box<[i8]>>("flip_prun") {
+            Some(a) => {
+                println!("reading flip_prun from file");
+                assert_eq!(a.len(), NB_SLICE_TWIST_FLIP * NB_FLIP / 2 + 1);
+                self.flip_prun = a;
+            },
+            None => {
+                self.init_flip_prun();
+                println!("dumping flip_prun in cache file");
+                self.dump_to_file(&self.flip_prun[..], "flip_prun");
+            },
+        }
     }
 
     fn init_twist_move(&mut self) {
