@@ -109,11 +109,29 @@ impl Coordinate {
         };
     }
 
+    fn read_cache_table<T>(&self, name: &str) -> Option<T>
+        where for<'a> T: serde::Deserialize<'a> {
+        let mut path = self.cache_folder_name.to_owned();
+        path.push_str("/");
+        path.push_str(name);
+
+        let f = File::open(path);
+        match f {
+            Ok(mut f) => {
+                let decoded: T = bincode::deserialize_from(&mut f, bincode::Infinite).unwrap();
+                return Some(decoded);
+            },
+            Err(e) => println!("{:?}", e),
+        }
+        None
+    }
+
     pub fn init_pruning(&mut self) {
         self.create_cache_dir();
 
         self.init_twist_move();
         // self.dump_to_file(&self.twist_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "twist_move");
+        self.dump_to_file(&self.twist_move[..], "twist_move");
 
         self.init_flip_move();
         // self.dump_to_file(&self.flip_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "flip_move");
@@ -134,19 +152,24 @@ impl Coordinate {
         // self.dump_to_file(&self.ur_to_df_move.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "ur_to_df_move");
 
         self.init_merge_ur_to_ul_and_ub_to_df();
-        // self.dump_to_file(&self.merge_ur_to_ul_and_ub_to_df.iter().map(|x| &x[..]).collect::<Vec<&[u32]>>(), "merge_ur_to_ul_and_ub_to_df");
+        // self.dump_to_file(&self.merge_ur_to_ul_and_ub_to_df.iter().map(|x| &x[..]).collect::<Vec<&[i16]>>(), "merge_ur_to_ul_and_ub_to_df");
 
         self.init_urf_to_dlf_parity_prun();
-        // self.dump_to_file(&self.urf_to_dlf_parity_prun.iter().map(|x| &x[..]).collect::<Vec<&[i8]>>(), "urf_to_dlf_parity_prun");
+        self.dump_to_file(&self.urf_to_dlf_parity_prun[..], "urf_to_dlf_parity_prun");
 
         self.init_ur_to_df_parity_prun();
-        // self.dump_to_file(&self.ur_to_df_parity_prun.iter().map(|x| &x[..]).collect::<Vec<&[i8]>>(), "ur_to_df_parity_prun");
+        self.dump_to_file(&self.ur_to_df_parity_prun[..], "ur_to_df_parity_prun");
 
         self.init_twist_prun();
-        // self.dump_to_file(&self.twist_prun.iter().map(|x| &x[..]).collect::<Vec<&[i8]>>(), "twist_prun");
-
+        self.dump_to_file(&self.twist_prun[..], "twist_prun");
+        match self.read_cache_table::<Box<[i8]>>("twist_prun") {
+            Some(a) => {
+                // assert_eq!(a[..], self.twist_move[..]);
+            },
+            None => unimplemented!(),
+        }
         self.init_flip_prun();
-        // self.dump_to_file(&self.flip_prun.iter().map(|x| &x[..]).collect::<Vec<&[i8]>>(), "flip_prun");
+        self.dump_to_file(&self.flip_prun[..], "flip_prun");
     }
 
     fn init_twist_move(&mut self) {
