@@ -4,6 +4,7 @@ use move_::Move;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
+use std::io::Read;
 
 use bincode;
 use serde;
@@ -118,7 +119,9 @@ impl Coordinate {
         let f = File::open(path);
         match f {
             Ok(mut f) => {
-                let decoded: T = bincode::deserialize_from(&mut f, bincode::Infinite).unwrap();
+                let mut buffer = Vec::new();
+                let _ = f.read_to_end(&mut buffer);
+                let decoded: T = bincode::deserialize(&buffer).unwrap();
                 return Some(decoded);
             },
             Err(e) => println!("{:?}", e),
