@@ -7,13 +7,13 @@ extern crate bincode;
 extern crate serde;
 
 mod move_;
-mod cube;
+mod cubie;
 mod coordinate;
 mod solver;
 
 use std::env;
 use move_::UserMove;
-use cube::Cube;
+use cubie::Cubie;
 use coordinate::Coordinate;
 use solver::Solver;
 
@@ -25,10 +25,10 @@ fn main() {
         }
         Some(arg) => {
             if let Ok(shuffle_sequence) = UserMove::sequence_from_str(&arg) {
-                let cube = Cube::from_shuffle_sequence(shuffle_sequence);
-                let mut coordinate = Coordinate::from_cube(&cube);
+                let cubie = Cubie::from_shuffle_sequence(shuffle_sequence);
+                let mut coordinate = Coordinate::from_cubie(&cubie);
                 coordinate.init_pruning();
-                let solver = Solver::new(cube);
+                let solver = Solver::new(cubie);
 
                 solver.solve();
             }

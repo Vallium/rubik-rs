@@ -1,5 +1,5 @@
-use cube::corners::Corner;
-use cube::edges::Edge;
+use cubie::corners::Corner;
+use cubie::edges::Edge;
 
 #[derive(Clone, Copy)]
 pub enum Move {
@@ -34,8 +34,8 @@ pub struct Move_ {
 
 impl Move_ {
     pub fn move_definition(m: Move) -> Self {
-        use cube::corners::Corner::*;
-        use cube::edges::Edge::*;
+        use cubie::corners::Corner::*;
+        use cubie::edges::Edge::*;
         use self::Move::*;
         match m {
             Up => Self {

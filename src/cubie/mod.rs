@@ -2,21 +2,21 @@ mod face;
 pub mod corners;
 pub mod edges;
 
-use cube::face::Face;
-use cube::corners::Corners;
-use cube::corners::Corner;
-use cube::edges::Edges;
-use cube::edges::Edge;
+use cubie::face::Face;
+use cubie::corners::Corners;
+use cubie::corners::Corner;
+use cubie::edges::Edges;
+use cubie::edges::Edge;
 use move_::Move;
 use move_::UserMove;
 
 #[derive(Eq, PartialEq)]
-pub struct Cube {
+pub struct Cubie {
     corners: Corners,
     edges: Edges,
 }
 
-impl Cube {
+impl Cubie {
     pub fn from_shuffle_sequence<I>(shuffle_sequence: I) -> Self
         where I: IntoIterator<Item=(UserMove, usize)>
     {
@@ -396,8 +396,8 @@ impl Cube {
     }
 
     pub fn ur_to_uf_standalone(index1: i16, index2: i16) -> i16 {
-        let mut a: Cube = Cube::new_default();
-        let mut b: Cube = Cube::new_default();
+        let mut a: Cubie = Cubie::new_default();
+        let mut b: Cubie = Cubie::new_default();
 
         a.set_ur_to_ul(index1);
         b.set_ub_to_df(index2);
@@ -508,7 +508,7 @@ impl Cube {
     }
 }
 
-impl Default for Cube {
+impl Default for Cubie {
     fn default() -> Self {
         Self {
             corners: corners::Corners::default(),

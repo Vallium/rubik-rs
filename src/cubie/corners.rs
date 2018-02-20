@@ -1,5 +1,4 @@
-use cube::face::Face;
-// use cube::CubeMove;
+use cubie::face::Face;
 use move_::Move;
 use move_::Move_;
 

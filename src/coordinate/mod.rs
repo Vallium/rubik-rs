@@ -1,4 +1,4 @@
-use cube::Cube;
+use cubie::Cubie;
 use move_::Move;
 
 use std::fs;
@@ -47,17 +47,17 @@ pub struct Coordinate {
 }
 
 impl Coordinate {
-    pub fn from_cube(cube: &Cube) -> Self {
+    pub fn from_cubie(cubie: &Cubie) -> Self {
         Self {
             cache_folder_name: String::from("pruning_tables"),
-            twist: cube.twist(),
-            flip: cube.flip(),
-            parity: cube.corner_parity(),
-            fr_to_br: cube.fr_to_br(),
-            urf_to_dlf: cube.urf_to_dlf(),
-            ur_to_ul: cube.ur_to_ul(),
-            ub_to_df: cube.ub_to_df(),
-            ur_to_df: cube.ur_to_df(),
+            twist: cubie.twist(),
+            flip: cubie.flip(),
+            parity: cubie.corner_parity(),
+            fr_to_br: cubie.fr_to_br(),
+            urf_to_dlf: cubie.urf_to_dlf(),
+            ur_to_ul: cubie.ur_to_ul(),
+            ub_to_df: cubie.ub_to_df(),
+            ur_to_df: cubie.ur_to_df(),
             twist_move: Box::new([[0; NB_MOVES]; NB_TWIST]),
             flip_move: Box::new([[0; NB_MOVES]; NB_FLIP]),
             parity_move: Box::new([
@@ -280,7 +280,7 @@ impl Coordinate {
     }
 
     fn init_twist_move(&mut self) {
-        let mut solved = Cube::new_default();
+        let mut solved = Cubie::new_default();
 
         for x in 0..NB_TWIST {
             solved.set_twist(x as i16);
@@ -295,7 +295,7 @@ impl Coordinate {
     }
 
     fn init_flip_move(&mut self) {
-        let mut solved = Cube::new_default();
+        let mut solved = Cubie::new_default();
 
         for x in 0..NB_FLIP {
             solved.set_flip(x as i16);
@@ -310,7 +310,7 @@ impl Coordinate {
     }
 
     fn init_fr_to_br_move(&mut self) {
-        let mut solved = Cube::new_default();
+        let mut solved = Cubie::new_default();
 
         for x in 0..NB_FR_TO_BR {
             solved.set_fr_to_br(x as i16);
@@ -325,7 +325,7 @@ impl Coordinate {
     }
 
     fn init_urf_to_dlf_move(&mut self) {
-        let mut solved = Cube::new_default();
+        let mut solved = Cubie::new_default();
 
         for x in 0..NB_URF_TO_DLF {
             solved.set_urf_to_dlf(x as i16);
@@ -340,7 +340,7 @@ impl Coordinate {
     }
 
     fn init_ur_to_ul_move(&mut self) {
-        let mut solved = Cube::new_default();
+        let mut solved = Cubie::new_default();
 
         for x in 0..NB_UR_TO_UL {
             solved.set_ur_to_ul(x as i16);
@@ -355,7 +355,7 @@ impl Coordinate {
     }
 
     fn init_ub_to_df_move(&mut self) {
-        let mut solved = Cube::new_default();
+        let mut solved = Cubie::new_default();
 
         for x in 0..NB_UR_TO_UL {
             solved.set_ub_to_df(x as i16);
@@ -370,7 +370,7 @@ impl Coordinate {
     }
 
     fn init_ur_to_df_move(&mut self) {
-        let mut solved = Cube::new_default();
+        let mut solved = Cubie::new_default();
 
         for x in 0..NB_UR_TO_DF {
             solved.set_ur_to_df(x as i16);
@@ -387,7 +387,7 @@ impl Coordinate {
     fn init_merge_ur_to_ul_and_ub_to_df(&mut self) {
         for ur_to_ul in 0..336 {
             for ub_to_df in 0..336 {
-                self.merge_ur_to_ul_and_ub_to_df[ur_to_ul][ub_to_df] = Cube::ur_to_uf_standalone(ur_to_ul as i16, ub_to_df as i16);
+                self.merge_ur_to_ul_and_ub_to_df[ur_to_ul][ub_to_df] = Cubie::ur_to_uf_standalone(ur_to_ul as i16, ub_to_df as i16);
             }
         }
     }
