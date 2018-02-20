@@ -1,20 +1,20 @@
-use cubie::Cubie;
+use cube::Cube;
 
 pub struct Solver {
     max_depth: u8,
-    cubie: Cubie,
+    cube: Cube,
 }
 
 impl Solver {
-    pub fn new(cubie: Cubie) -> Self {
+    pub fn new(cube: Cube) -> Self {
         Self {
             max_depth: 26,
-            cubie: cubie,
+            cube: cube,
         }
     }
 
     pub fn solve(&self) {
-        self.cubie.print();
-        println!("Is solved? {}", self.cubie.is_solved());
+        self.cube.print();
+        println!("Is solved? {}", self.cube.is_solved());
     }
 }
