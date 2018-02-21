@@ -29,7 +29,7 @@ fn main() {
                 // let mut coordinate = Coordinate::from_cubie(&cubie);
                 // coordinate.init_pruning();
                 let cube = Cube::from_shuffle_sequence(shuffle_sequence);
-                let solver = Solver::new(cube);
+                let mut solver = Solver::new(cube);
 
                 solver.solve();
             }

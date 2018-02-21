@@ -11,7 +11,7 @@ impl Cube {
     pub fn from_shuffle_sequence<I>(shuffle_sequence: I) -> Self
         where I: IntoIterator<Item=(UserMove, usize)> {
         let cubie = Cubie::from_shuffle_sequence(shuffle_sequence);
-        let mut coordinate = Coordinate::from_cubie(&cubie);
+        let mut coordinate = Coordinate::from_cubie();
 
         coordinate.init_pruning();
 
@@ -19,6 +19,14 @@ impl Cube {
             cubie,
             coordinate,
         }
+    }
+
+    pub fn cubie(&self) -> &Cubie {
+        &self.cubie
+    }
+
+    pub fn coordinate(&self) -> &Coordinate {
+        &self.coordinate
     }
 
     pub fn print(&self) {

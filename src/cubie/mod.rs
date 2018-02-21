@@ -97,8 +97,8 @@ impl Cubie {
         self.edges.orientations[usize::from(Edge::BR)] = (2 - parity as u8 % 2) % 2;
     }
 
-    pub fn corner_parity(&self) -> u32 {
-        let mut ret: u32 = 0;
+    pub fn corner_parity(&self) -> i8 {
+        let mut ret: i8 = 0;
 
         for x in (usize::from(Corner::URF) + 1..=usize::from(Corner::DRB)).rev() {
             for y in (usize::from(Corner::URF)..x).rev() {

@@ -23,41 +23,42 @@ const NB_PARITY: usize = 2;
 
 pub struct Coordinate {
     cache_folder_name: String,
-    twist: u32,
-    flip: u32,
-    parity: u32,
-    fr_to_br: u32,
-    urf_to_dlf: u32,
-    ur_to_ul: u32,
-    ub_to_df: u32,
-    ur_to_df: u32,
-    twist_move: Box<[[u32; NB_MOVES]]>,
-    flip_move: Box<[[u32; NB_MOVES]]>,
-    parity_move: Box<[[i8; NB_MOVES]]>,
-    fr_to_br_move: Box<[[u32; NB_MOVES]]>,
-    urf_to_dlf_move: Box<[[u32; NB_MOVES]]>,
+    // twist: u32,
+    // flip: u32,
+    // parity: u32,
+    // fr_to_br: u32,
+    // urf_to_dlf: u32,
+    // ur_to_ul: u32,
+    // ub_to_df: u32,
+    // ur_to_df: u32,
+    pub twist_move: Box<[[u32; NB_MOVES]]>,
+    pub flip_move: Box<[[u32; NB_MOVES]]>,
+    pub parity_move: Box<[[i8; NB_MOVES]]>,
+    pub fr_to_br_move: Box<[[u32; NB_MOVES]]>,
+    pub urf_to_dlf_move: Box<[[u32; NB_MOVES]]>,
     ur_to_ul_move: Box<[[u32; NB_MOVES]]>,
     ub_to_df_move: Box<[[u32; NB_MOVES]]>,
     ur_to_df_move: Box<[[u32; NB_MOVES]]>,
-    merge_ur_to_ul_and_ub_to_df: Box<[[i16; 336]]>,
-    urf_to_dlf_parity_prun: Box<[i8]>,
-    ur_to_df_parity_prun: Box<[i8]>,
-    twist_prun: Box<[i8]>,
-    flip_prun: Box<[i8]>,
+    pub merge_ur_to_ul_and_ub_to_df: Box<[[i16; 336]]>,
+    pub urf_to_dlf_parity_prun: Box<[i8]>,
+    pub ur_to_df_parity_prun: Box<[i8]>,
+    pub twist_prun: Box<[i8]>,
+    pub flip_prun: Box<[i8]>,
 }
 
 impl Coordinate {
-    pub fn from_cubie(cubie: &Cubie) -> Self {
+    pub fn from_cubie() -> Self {
+    // pub fn from_cubie(cubie: &Cubie) -> Self {
         Self {
             cache_folder_name: String::from("pruning_tables"),
-            twist: cubie.twist(),
-            flip: cubie.flip(),
-            parity: cubie.corner_parity(),
-            fr_to_br: cubie.fr_to_br(),
-            urf_to_dlf: cubie.urf_to_dlf(),
-            ur_to_ul: cubie.ur_to_ul(),
-            ub_to_df: cubie.ub_to_df(),
-            ur_to_df: cubie.ur_to_df(),
+            // twist: cubie.twist(),
+            // flip: cubie.flip(),
+            // parity: cubie.corner_parity(),
+            // fr_to_br: cubie.fr_to_br(),
+            // urf_to_dlf: cubie.urf_to_dlf(),
+            // ur_to_ul: cubie.ur_to_ul(),
+            // ub_to_df: cubie.ub_to_df(),
+            // ur_to_df: cubie.ur_to_df(),
             twist_move: Box::new([[0; NB_MOVES]; NB_TWIST]),
             flip_move: Box::new([[0; NB_MOVES]; NB_FLIP]),
             parity_move: Box::new([
@@ -522,7 +523,7 @@ impl Coordinate {
         }
     }
 
-    fn set_prunning(arr: &mut [i8], i: usize, value: i8) {
+    pub fn set_prunning(arr: &mut [i8], i: usize, value: i8) {
         if i & 1 == 0 {
             arr[i / 2] &= 0xf0 | value;
         } else {
@@ -530,7 +531,7 @@ impl Coordinate {
         }
     }
 
-    fn prunning(arr: &[i8], i: usize) -> i8{
+    pub fn prunning(arr: &[i8], i: usize) -> i8{
         let ret: i8;
 
         if i & 1 == 0 {
